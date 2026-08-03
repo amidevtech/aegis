@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "pl",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Nazwa aplikacji pod ikoną",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Medicine Cabinet" }
+        },
+        "pl" : {
+          "stringUnit" : { "state" : "translated", "value" : "Apteczka" }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Krótka nazwa aplikacji używana przez system",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Medicine Cabinet" }
+        },
+        "pl" : {
+          "stringUnit" : { "state" : "translated", "value" : "Apteczka" }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

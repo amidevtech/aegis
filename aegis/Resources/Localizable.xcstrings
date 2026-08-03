@@ -1,0 +1,1256 @@
+{
+  "sourceLanguage" : "pl",
+  "strings" : {
+    "app.title" : {
+      "comment" : "Nazwa aplikacji widoczna na ekranie przeglądu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Home Medicine Cabinet" }
+        },
+        "pl" : {
+          "stringUnit" : { "state" : "translated", "value" : "Domowa Apteczka" }
+        }
+      }
+    },
+    "archive.archived_at" : {
+      "comment" : "Etykieta daty przeniesienia do archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archived" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zarchiwizowany" } }
+      }
+    },
+    "archive.delete.confirm.message" : {
+      "comment" : "Treść potwierdzenia trwałego usunięcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The medicine will disappear from your history on every device. This cannot be undone."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lek zniknie z historii na wszystkich urządzeniach. Tej operacji nie można cofnąć."
+          }
+        }
+      }
+    },
+    "archive.delete.confirm.title" : {
+      "comment" : "Tytuł potwierdzenia trwałego usunięcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete permanently?" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Usunąć trwale?" } }
+      }
+    },
+    "archive.empty.message" : {
+      "comment" : "Opis pustego archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medicines moved to the archive are kept here as history."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leki przeniesione do archiwum zostaną tu zapisane jako historia."
+          }
+        }
+      }
+    },
+    "archive.empty.title" : {
+      "comment" : "Nagłówek pustego archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The archive is empty" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Archiwum jest puste" } }
+      }
+    },
+    "archive.restore" : {
+      "comment" : "Akcja przywracająca lek z archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Return to cabinet" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przywróć do apteczki" } }
+      }
+    },
+    "archive.search_prompt" : {
+      "comment" : "Podpowiedź w polu wyszukiwania archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search the archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Szukaj w archiwum" } }
+      }
+    },
+    "archive.subtitle" : {
+      "comment" : "Podtytuł ekranu archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medicines that used to be in the cabinet"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leki, które kiedyś były w apteczce"
+          }
+        }
+      }
+    },
+    "archive.title" : {
+      "comment" : "Tytuł ekranu z historią leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Archiwum" } }
+      }
+    },
+    "archive_reason.expired" : {
+      "comment" : "Powód archiwizacji leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expired" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przeterminowany" } }
+      }
+    },
+    "archive_reason.removed" : {
+      "comment" : "Powód archiwizacji leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Removed from cabinet" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Usunięty z apteczki" } }
+      }
+    },
+    "archive_reason.used_up" : {
+      "comment" : "Powód archiwizacji leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Used up" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zużyty" } }
+      }
+    },
+    "common.cancel" : {
+      "comment" : "Przycisk zamykający arkusz bez zapisywania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Anuluj" } }
+      }
+    },
+    "common.delete" : {
+      "comment" : "Akcja trwałego usunięcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Usuń" } }
+      }
+    },
+    "common.done" : {
+      "comment" : "Przycisk zamykający arkusz informacyjny",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Gotowe" } }
+      }
+    },
+    "common.edit" : {
+      "comment" : "Akcja otwierająca formularz edycji",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Edytuj" } }
+      }
+    },
+    "common.not_provided" : {
+      "comment" : "Zastępnik dla pustego pola w szczegółach leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not provided" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nie podano" } }
+      }
+    },
+    "common.save" : {
+      "comment" : "Przycisk zapisujący formularz",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zapisz" } }
+      }
+    },
+    "dashboard.attention.all_good" : {
+      "comment" : "Komunikat, gdy nic nie jest przeterminowane",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every medicine is within its expiry date."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystkie leki mają aktualny termin ważności."
+          }
+        }
+      }
+    },
+    "dashboard.attention.count" : {
+      "comment" : "Liczba przeterminowanych leków w panelu Wymagają uwagi",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld medicine is expired" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld medicines are expired" }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld lek jest przeterminowany" }
+              },
+              "few" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld leki są przeterminowane" }
+              },
+              "many" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld leków jest przeterminowanych" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "%lld leku jest przeterminowane" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dashboard.attention.title" : {
+      "comment" : "Nagłówek panelu z lekami przeterminowanymi",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Needs attention" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wymagają uwagi" } }
+      }
+    },
+    "dashboard.empty.message" : {
+      "comment" : "Opis pod nagłówkiem pustej apteczki",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details are stored safely and stay easy to find."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dane leku będą bezpiecznie zapisane i łatwe do znalezienia."
+          }
+        }
+      }
+    },
+    "dashboard.empty.title" : {
+      "comment" : "Nagłówek pustej apteczki",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add your first medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dodaj pierwszy lek" } }
+      }
+    },
+    "dashboard.greeting.afternoon" : {
+      "comment" : "Powitanie wyświetlane po południu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Good afternoon" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dzień dobry" } }
+      }
+    },
+    "dashboard.greeting.evening" : {
+      "comment" : "Powitanie wyświetlane wieczorem",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Good evening" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dobry wieczór" } }
+      }
+    },
+    "dashboard.greeting.morning" : {
+      "comment" : "Powitanie wyświetlane rano",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Good morning" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dzień dobry" } }
+      }
+    },
+    "dashboard.medicines.see_all" : {
+      "comment" : "Przycisk przechodzący do pełnej listy leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "See all" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zobacz wszystkie" } }
+      }
+    },
+    "dashboard.medicines.title" : {
+      "comment" : "Nagłówek sekcji z aktywnymi lekami",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicines at home" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Leki w domu" } }
+      }
+    },
+    "dashboard.stat.active.caption" : {
+      "comment" : "Opis pod liczbą aktywnych leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "available at home" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "leki dostępne w domu" } }
+      }
+    },
+    "dashboard.stat.active.title" : {
+      "comment" : "Tytuł kafelka z liczbą leków w apteczce",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Active medicines" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aktywne leki" } }
+      }
+    },
+    "dashboard.stat.expiring.caption" : {
+      "comment" : "Opis pod liczbą leków bliskich przeterminowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "within the next 30 days" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "w ciągu najbliższych 30 dni" } }
+      }
+    },
+    "dashboard.stat.expiring.title" : {
+      "comment" : "Tytuł kafelka z liczbą leków bliskich przeterminowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiring soon" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wkrótce wygasają" } }
+      }
+    },
+    "dashboard.stat.opened.caption" : {
+      "comment" : "Opis pod liczbą otwartych opakowań",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "packages opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "opakowania otwarte" } }
+      }
+    },
+    "dashboard.stat.opened.title" : {
+      "comment" : "Tytuł kafelka z liczbą otwartych opakowań",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwarte" } }
+      }
+    },
+    "dashboard.subtitle" : {
+      "comment" : "Podtytuł pod powitaniem na ekranie przeglądu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check what is in your medicine cabinet"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprawdź stan swojej domowej apteczki"
+          }
+        }
+      }
+    },
+    "detail.added" : {
+      "comment" : "Etykieta pola z datą dodania leku do apteczki",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Added" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dodany" } }
+      }
+    },
+    "detail.archive" : {
+      "comment" : "Akcja usuwająca lek z apteczki, ale zachowująca go w historii",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move to archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przenieś do archiwum" } }
+      }
+    },
+    "detail.archive.title" : {
+      "comment" : "Nagłówek pytania o powód przeniesienia leku do archiwum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reason for archiving" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Powód archiwizacji" } }
+      }
+    },
+    "detail.dosage" : {
+      "comment" : "Etykieta pola z dawkowaniem",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Dosage" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dawkowanie" } }
+      }
+    },
+    "detail.effective_expiry" : {
+      "comment" : "Etykieta wcześniejszego z dwóch terminów ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Effective date" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Obowiązujący termin" } }
+      }
+    },
+    "detail.expiry" : {
+      "comment" : "Etykieta pola z terminem z opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiry date" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Termin ważności" } }
+      }
+    },
+    "detail.form" : {
+      "comment" : "Etykieta pola z postacią leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Form" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Postać" } }
+      }
+    },
+    "detail.indication" : {
+      "comment" : "Etykieta pola z dolegliwością",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Prescribed to treat" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Na co przepisany" } }
+      }
+    },
+    "detail.mark_opened" : {
+      "comment" : "Akcja odnotowująca otwarcie opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark as opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Oznacz jako otwarty" } }
+      }
+    },
+    "detail.mark_unopened" : {
+      "comment" : "Akcja cofająca oznaczenie otwarcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Mark as unopened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Oznacz jako nieotwarty" } }
+      }
+    },
+    "detail.notes" : {
+      "comment" : "Etykieta pola z notatkami",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Notatki" } }
+      }
+    },
+    "detail.opened_at" : {
+      "comment" : "Etykieta pola z datą otwarcia opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwarty" } }
+      }
+    },
+    "detail.opened_expiry" : {
+      "comment" : "Etykieta pola z terminem liczonym od otwarcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use by after opening" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ważny po otwarciu do" } }
+      }
+    },
+    "detail.person" : {
+      "comment" : "Etykieta pola z osobą, dla której lek przepisano",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Prescribed for" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Na kogo przepisany" } }
+      }
+    },
+    "detail.quantity" : {
+      "comment" : "Etykieta pola z wielkością opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Amount / package" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ilość / opakowanie" } }
+      }
+    },
+    "detail.substance" : {
+      "comment" : "Etykieta pola z substancją czynną",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Active substance" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Substancja czynna" } }
+      }
+    },
+    "expired.archive_all" : {
+      "comment" : "Akcja archiwizująca wszystkie przeterminowane leki",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Move all to archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przenieś wszystkie do archiwum" } }
+      }
+    },
+    "expired.archive_one" : {
+      "comment" : "Akcja archiwizująca pojedynczy lek",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Do archiwum" } }
+      }
+    },
+    "expired.expired_on" : {
+      "comment" : "Data utraty ważności w arkuszu przeterminowanych leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expired on %@" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Termin minął %@" } }
+      }
+    },
+    "expired.footnote" : {
+      "comment" : "Wyjaśnienie, że archiwizacja nie kasuje danych",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archived medicines leave the cabinet but stay in your history."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarchiwizowane leki znikają z apteczki, ale zostają w historii."
+          }
+        }
+      }
+    },
+    "expired.later" : {
+      "comment" : "Zamknięcie arkusza bez archiwizowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not now" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nie teraz" } }
+      }
+    },
+    "expired.message" : {
+      "comment" : "Podsumowanie liczby przeterminowanych leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld medicine in your cabinet has expired."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld medicines in your cabinet have expired."
+                }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld lek w Twojej apteczce stracił ważność."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld leki w Twojej apteczce straciły ważność."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld leków w Twojej apteczce straciło ważność."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld leku w Twojej apteczce straciło ważność."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "expired.title" : {
+      "comment" : "Tytuł arkusza pokazywanego przy starcie aplikacji",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expired medicines" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Leki po terminie" } }
+      }
+    },
+    "form.custom_date" : {
+      "comment" : "Etykieta ręcznie wybranej daty ważności po otwarciu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use by after opening" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ważny po otwarciu do" } }
+      }
+    },
+    "form.days_after_opening" : {
+      "comment" : "Etykieta liczby dni przydatności po otwarciu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Use within" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ważny po otwarciu" } }
+      }
+    },
+    "form.days_value" : {
+      "comment" : "Liczba dni przydatności po otwarciu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day" } },
+              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days" } }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld dzień" } },
+              "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni" } },
+              "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni" } },
+              "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dnia" } }
+            }
+          }
+        }
+      }
+    },
+    "form.dosage.prompt" : {
+      "comment" : "Przykładowa wartość w polu dawkowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. 1 tablet every 8 hours" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. 1 tabletka co 8 godzin" } }
+      }
+    },
+    "form.indication.prompt" : {
+      "comment" : "Przykładowa wartość w polu dolegliwości",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. headache" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. ból głowy" } }
+      }
+    },
+    "form.name" : {
+      "comment" : "Etykieta pola nazwy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicine name" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nazwa leku" } }
+      }
+    },
+    "form.name.prompt" : {
+      "comment" : "Przykładowa wartość w polu nazwy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. Panadol" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. Apap" } }
+      }
+    },
+    "form.notes.prompt" : {
+      "comment" : "Przykładowa wartość w polu notatek",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Additional information" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dodatkowe informacje" } }
+      }
+    },
+    "form.opened" : {
+      "comment" : "Przełącznik oznaczający otwarte opakowanie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Package opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Opakowanie otwarte" } }
+      }
+    },
+    "form.opened_at" : {
+      "comment" : "Etykieta wyboru daty otwarcia",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opening date" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Data otwarcia" } }
+      }
+    },
+    "form.person.prompt" : {
+      "comment" : "Przykładowa wartość w polu osoby",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. Anna" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. Ania" } }
+      }
+    },
+    "form.quantity.prompt" : {
+      "comment" : "Przykładowa wartość w polu wielkości opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. 20 tablets" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. 20 tabletek" } }
+      }
+    },
+    "form.section.expiry" : {
+      "comment" : "Nagłówek sekcji z terminami ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiry" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ważność" } }
+      }
+    },
+    "form.section.medicine" : {
+      "comment" : "Nagłówek sekcji z nazwą i opakowaniem",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Lek" } }
+      }
+    },
+    "form.section.notes" : {
+      "comment" : "Nagłówek sekcji z dodatkowymi uwagami",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Notes" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Notatki" } }
+      }
+    },
+    "form.section.prescription" : {
+      "comment" : "Nagłówek sekcji z osobą, dolegliwością i dawkowaniem",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Prescription" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Recepta" } }
+      }
+    },
+    "form.substance.prompt" : {
+      "comment" : "Przykładowa wartość w polu substancji czynnej",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "e.g. paracetamol" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "np. paracetamol" } }
+      }
+    },
+    "form.suggestions" : {
+      "comment" : "Nagłówek listy wcześniej wpisanych wartości",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Suggestions" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Podpowiedzi" } }
+      }
+    },
+    "form.title.edit" : {
+      "comment" : "Tytuł formularza edycji leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Edycja leku" } }
+      }
+    },
+    "form.title.new" : {
+      "comment" : "Tytuł formularza dodawania leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nowy lek" } }
+      }
+    },
+    "form.use_custom_date" : {
+      "comment" : "Przełącznik zastępujący liczbę dni wyborem daty",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Set a specific date" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ustaw konkretną datę" } }
+      }
+    },
+    "medicine_form.capsule" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Capsules" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Kapsułki" } }
+      }
+    },
+    "medicine_form.drops" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Drops" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Krople" } }
+      }
+    },
+    "medicine_form.eye_drops" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Eye drops" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Krople do oczu" } }
+      }
+    },
+    "medicine_form.inhaler" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Inhaler" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Inhalator" } }
+      }
+    },
+    "medicine_form.injection" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Injection" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zastrzyk" } }
+      }
+    },
+    "medicine_form.ointment" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ointment / cream" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Maść / krem" } }
+      }
+    },
+    "medicine_form.other" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Other" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Inne" } }
+      }
+    },
+    "medicine_form.spray" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spray" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Spray" } }
+      }
+    },
+    "medicine_form.suppository" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Suppositories" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Czopki" } }
+      }
+    },
+    "medicine_form.syrup" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Syrup" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Syrop" } }
+      }
+    },
+    "medicine_form.tablet" : {
+      "comment" : "Postać leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Tablets" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Tabletki" } }
+      }
+    },
+    "medicines.add" : {
+      "comment" : "Akcja otwierająca formularz nowego leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dodaj lek" } }
+      }
+    },
+    "medicines.empty.message" : {
+      "comment" : "Opis pustej listy leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a medicine to keep its expiry date and dosage at hand."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj lek, aby mieć pod ręką termin ważności i dawkowanie."
+          }
+        }
+      }
+    },
+    "medicines.empty.title" : {
+      "comment" : "Nagłówek pustej listy leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your cabinet is empty" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Apteczka jest pusta" } }
+      }
+    },
+    "medicines.no_results.message" : {
+      "comment" : "Opis, gdy wyszukiwanie nic nie znalazło",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try a different name, active substance or person."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spróbuj innej nazwy, substancji czynnej lub imienia."
+          }
+        }
+      }
+    },
+    "medicines.no_results.title" : {
+      "comment" : "Nagłówek, gdy wyszukiwanie nic nie znalazło",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No results" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Brak wyników" } }
+      }
+    },
+    "medicines.search_prompt" : {
+      "comment" : "Podpowiedź w polu wyszukiwania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search by medicine, use or person"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szukaj leku, zastosowania lub osoby"
+          }
+        }
+      }
+    },
+    "medicines.section.expired" : {
+      "comment" : "Nagłówek sekcji listy z lekami po terminie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expired" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przeterminowane" } }
+      }
+    },
+    "medicines.section.expiring_soon" : {
+      "comment" : "Nagłówek sekcji listy z lekami bliskimi terminu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiring soon" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wkrótce wygasają" } }
+      }
+    },
+    "medicines.section.valid" : {
+      "comment" : "Nagłówek sekcji listy z lekami w terminie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Valid" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aktualne" } }
+      }
+    },
+    "medicines.sort" : {
+      "comment" : "Menu wyboru kolejności listy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sort" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Sortowanie" } }
+      }
+    },
+    "medicines.sort.expiry" : {
+      "comment" : "Sortowanie listy według terminu ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiry date" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Termin ważności" } }
+      }
+    },
+    "medicines.sort.name" : {
+      "comment" : "Sortowanie listy alfabetycznie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nazwa" } }
+      }
+    },
+    "medicines.sort.person" : {
+      "comment" : "Sortowanie listy według osoby",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Person" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Osoba" } }
+      }
+    },
+    "medicines.title" : {
+      "comment" : "Tytuł ekranu z listą leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicines" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Leki" } }
+      }
+    },
+    "menu.new_medicine" : {
+      "comment" : "Pozycja menu na Macu otwierająca formularz",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New Medicine" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nowy lek" } }
+      }
+    },
+    "menu.search" : {
+      "comment" : "Pozycja menu na Macu ustawiająca kursor w wyszukiwarce",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Search" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Szukaj" } }
+      }
+    },
+    "notification.body.in_30_days" : {
+      "comment" : "Treść przypomnienia na 30 dni przed terminem; %@ to nazwa leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ expires in 30 days" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "%@ traci ważność za 30 dni" } }
+      }
+    },
+    "notification.body.in_7_days" : {
+      "comment" : "Treść przypomnienia na 7 dni przed terminem; %@ to nazwa leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ expires in 7 days" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "%@ traci ważność za 7 dni" } }
+      }
+    },
+    "notification.body.today" : {
+      "comment" : "Treść przypomnienia w dniu utraty ważności; %@ to nazwa leku",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%@ expires today" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "%@ traci ważność dzisiaj" } }
+      }
+    },
+    "notification.expired.title" : {
+      "comment" : "Tytuł powiadomienia w dniu utraty ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicine expired" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Lek stracił ważność" } }
+      }
+    },
+    "notification.expiring.title" : {
+      "comment" : "Tytuł powiadomienia o zbliżającym się terminie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiry date approaching" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zbliża się termin ważności" } }
+      }
+    },
+    "search.token.indication" : {
+      "comment" : "Token wyszukiwania zawężający wyniki do jednej dolegliwości",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Used for: %@" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zastosowanie: %@" } }
+      }
+    },
+    "search.token.person" : {
+      "comment" : "Token wyszukiwania zawężający wyniki do jednej osoby",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Person: %@" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Osoba: %@" } }
+      }
+    },
+    "search.token.substance" : {
+      "comment" : "Token wyszukiwania zawężający wyniki do jednej substancji czynnej",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Substance: %@" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Substancja: %@" } }
+      }
+    },
+    "status.expired" : {
+      "comment" : "Znacznik leku po terminie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expired" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przeterminowany" } }
+      }
+    },
+    "status.expired_days_ago" : {
+      "comment" : "Liczba dni, które minęły od utraty ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "Expired %lld day ago" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "Expired %lld days ago" }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "Po terminie od %lld dnia" }
+              },
+              "few" : {
+                "stringUnit" : { "state" : "translated", "value" : "Po terminie od %lld dni" }
+              },
+              "many" : {
+                "stringUnit" : { "state" : "translated", "value" : "Po terminie od %lld dni" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "Po terminie od %lld dnia" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status.expires_in_days" : {
+      "comment" : "Liczba dni pozostałych do końca ważności",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "Expires in %lld day" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "Expires in %lld days" }
+              }
+            }
+          }
+        },
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : { "state" : "translated", "value" : "Wygasa za %lld dzień" }
+              },
+              "few" : {
+                "stringUnit" : { "state" : "translated", "value" : "Wygasa za %lld dni" }
+              },
+              "many" : {
+                "stringUnit" : { "state" : "translated", "value" : "Wygasa za %lld dni" }
+              },
+              "other" : {
+                "stringUnit" : { "state" : "translated", "value" : "Wygasa za %lld dnia" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "status.expires_today" : {
+      "comment" : "Opis terminu upływającego dzisiaj",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expires today" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wygasa dziś" } }
+      }
+    },
+    "status.expiring_soon" : {
+      "comment" : "Znacznik leku bliskiego przeterminowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Expiring soon" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wygasa wkrótce" } }
+      }
+    },
+    "status.opened" : {
+      "comment" : "Znacznik otwartego opakowania",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Opened" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwarty" } }
+      }
+    },
+    "status.valid" : {
+      "comment" : "Znacznik leku w terminie",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Valid" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aktualny" } }
+      }
+    },
+    "tab.archive" : {
+      "comment" : "Zakładka z historią leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Archive" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Archiwum" } }
+      }
+    },
+    "tab.medicines" : {
+      "comment" : "Zakładka z listą wszystkich leków",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Medicines" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Leki" } }
+      }
+    },
+    "tab.overview" : {
+      "comment" : "Zakładka z podsumowaniem apteczki",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Overview" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Przegląd" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
