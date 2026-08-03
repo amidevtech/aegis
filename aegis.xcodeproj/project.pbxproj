@@ -12,14 +12,14 @@
 			containerPortal = 83BD20BD3020794C00DE3770 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 83BD20C43020794C00DE3770;
-			remoteInfo = aegis;
+			remoteInfo = "Aegis Medicine Cabinet";
 		};
 		83BD20DF3020794D00DE3770 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83BD20BD3020794C00DE3770 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 83BD20C43020794C00DE3770;
-			remoteInfo = aegis;
+			remoteInfo = "Aegis Medicine Cabinet";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		83BD20C43020794C00DE3770 /* aegis */ = {
+		83BD20C43020794C00DE3770 /* Aegis Medicine Cabinet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83BD20E83020794D00DE3770 /* Build configuration list for PBXNativeTarget "aegis" */;
+			buildConfigurationList = 83BD20E83020794D00DE3770 /* Build configuration list for PBXNativeTarget "Aegis Medicine Cabinet" */;
 			buildPhases = (
 				83BD20C13020794C00DE3770 /* Sources */,
 				83BD20C23020794C00DE3770 /* Frameworks */,
@@ -110,10 +110,10 @@
 			fileSystemSynchronizedGroups = (
 				83BD20C73020794C00DE3770 /* aegis */,
 			);
-			name = aegis;
+			name = "Aegis Medicine Cabinet";
 			packageProductDependencies = (
 			);
-			productName = aegis;
+			productName = "Aegis Medicine Cabinet";
 			productReference = 83BD20C53020794C00DE3770 /* Aegis Medicine Cabinet.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -201,7 +201,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83BD20C43020794C00DE3770 /* aegis */,
+				83BD20C43020794C00DE3770 /* Aegis Medicine Cabinet */,
 				83BD20D33020794D00DE3770 /* aegisTests */,
 				83BD20DD3020794D00DE3770 /* aegisUITests */,
 			);
@@ -259,12 +259,12 @@
 /* Begin PBXTargetDependency section */
 		83BD20D63020794D00DE3770 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 83BD20C43020794C00DE3770 /* aegis */;
+			target = 83BD20C43020794C00DE3770 /* Aegis Medicine Cabinet */;
 			targetProxy = 83BD20D53020794D00DE3770 /* PBXContainerItemProxy */;
 		};
 		83BD20E03020794D00DE3770 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 83BD20C43020794C00DE3770 /* aegis */;
+			target = 83BD20C43020794C00DE3770 /* Aegis Medicine Cabinet */;
 			targetProxy = 83BD20DF3020794D00DE3770 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -503,7 +503,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/aegis.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/aegis";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Aegis Medicine Cabinet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Aegis Medicine Cabinet";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Debug;
@@ -529,7 +529,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/aegis.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/aegis";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Aegis Medicine Cabinet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Aegis Medicine Cabinet";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Release;
@@ -554,7 +554,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = aegis;
+				TEST_TARGET_NAME = "Aegis Medicine Cabinet";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Debug;
@@ -579,7 +579,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = aegis;
+				TEST_TARGET_NAME = "Aegis Medicine Cabinet";
 				XROS_DEPLOYMENT_TARGET = 26.5;
 			};
 			name = Release;
@@ -596,7 +596,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83BD20E83020794D00DE3770 /* Build configuration list for PBXNativeTarget "aegis" */ = {
+		83BD20E83020794D00DE3770 /* Build configuration list for PBXNativeTarget "Aegis Medicine Cabinet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83BD20E93020794D00DE3770 /* Debug */,
