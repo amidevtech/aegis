@@ -6,14 +6,14 @@
 import Foundation
 import SwiftData
 
-/// Lek w domowej apteczce.
+/// A medicine in the home cabinet.
 ///
-/// Model jest zgodny z wymaganiami CloudKit: każda właściwość ma wartość domyślną
-/// albo jest opcjonalna, nie ma też ograniczeń unikalności.
+/// Model meets CloudKit requirements: every property has a default value
+/// or is optional, and there are no uniqueness constraints.
 @Model
 final class Medicine {
-    /// Stabilny identyfikator używany do powiązania leku z zaplanowanymi powiadomieniami.
-    /// `persistentModelID` się do tego nie nadaje, bo nie ma trwałej reprezentacji tekstowej.
+    /// Stable identifier used to link a medicine to scheduled notifications.
+    /// `persistentModelID` is unsuitable because it has no durable string form.
     var uuid: UUID = UUID()
 
     var name: String = ""
@@ -31,15 +31,18 @@ final class Medicine {
     var daysAfterOpening: Int?
     var openedExpiryOverride: Date?
 
-    /// Wcześniejszy z terminów - z opakowania i po otwarciu.
+    /// Earlier of the package and post-opening expiry dates.
     ///
-    /// Trzymany w bazie, a nie liczony w locie, bo `#Predicate` nie potrafi filtrować
-    /// po właściwościach obliczanych. Aktualizuje go `refreshEffectiveExpiry()`.
+    /// Stored in the database rather than computed on the fly, because `#Predicate`
+    /// cannot filter on computed properties. Updated by `refreshEffectiveExpiry()`.
     var effectiveExpiryDate: Date = Date.distantFuture
 
     var createdAt: Date = Date.now
     var archivedAt: Date?
     var archiveReasonRaw: String?
+
+    /// Timestamp for last-write-wins when mirroring CloudKit.
+    var modifiedAt: Date = Date.now
 
     init(
         name: String = "",
@@ -55,7 +58,8 @@ final class Medicine {
         openedAt: Date? = nil,
         daysAfterOpening: Int? = nil,
         openedExpiryOverride: Date? = nil,
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        modifiedAt: Date = .now
     ) {
         self.name = name
         self.activeSubstance = activeSubstance
@@ -71,12 +75,17 @@ final class Medicine {
         self.daysAfterOpening = daysAfterOpening
         self.openedExpiryOverride = openedExpiryOverride
         self.createdAt = createdAt
+        self.modifiedAt = modifiedAt
         self.effectiveExpiryDate = ExpiryCalculator.effectiveExpiry(
             packageExpiry: expiryDate,
             isOpened: isOpened,
             openedAt: openedAt,
             daysAfterOpening: daysAfterOpening,
             openedExpiryOverride: openedExpiryOverride)
+    }
+
+    func touchModified(at date: Date = .now) {
+        modifiedAt = date
     }
 }
 
@@ -93,7 +102,7 @@ extension Medicine {
 
     var isArchived: Bool { archivedAt != nil }
 
-    /// Termin liczony od otwarcia opakowania, o ile lek jest otwarty.
+    /// Expiry counted from package opening, when the medicine is opened.
     var openedExpiryDate: Date? {
         guard isOpened else { return nil }
         return ExpiryCalculator.openedExpiry(
@@ -102,7 +111,7 @@ extension Medicine {
             override: openedExpiryOverride)
     }
 
-    /// Czy o terminie decyduje otwarcie opakowania, a nie data z pudełka.
+    /// Whether the effective date is driven by opening rather than the box date.
     var isLimitedByOpening: Bool {
         guard let openedExpiryDate else { return false }
         return openedExpiryDate < Calendar.current.startOfDay(for: expiryDate)
@@ -116,7 +125,7 @@ extension Medicine {
         ExpiryCalculator.daysRemaining(until: effectiveExpiryDate, now: now)
     }
 
-    /// Przelicza zapisany termin obowiązujący. Wywoływane po każdej zmianie dat.
+    /// Recalculates the stored effective expiry. Called after every date change.
     func refreshEffectiveExpiry() {
         effectiveExpiryDate = ExpiryCalculator.effectiveExpiry(
             packageExpiry: expiryDate,

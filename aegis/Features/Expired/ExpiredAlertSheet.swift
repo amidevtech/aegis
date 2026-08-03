@@ -6,15 +6,21 @@
 import SwiftData
 import SwiftUI
 
-/// Arkusz pokazywany przy starcie aplikacji, gdy w apteczce są leki po terminie.
-///
-/// Jedyną akcją "usuwającą" jest archiwizacja - lek znika z apteczki, ale zostaje
-/// w historii jako informacja, że kiedyś był przepisany.
+/// Sheet shown at app launch when the cabinet has expired medicines.
 struct ExpiredAlertSheet: View {
     let medicines: [Medicine]
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(AppState.self) private var appState
+
+    @State private var pendingDeleteAll = false
+    @State private var handledUUIDs: Set<UUID> = []
+
+    private var remainingMedicines: [Medicine] {
+        medicines.filter { !handledUUIDs.contains($0.uuid) && !$0.isArchived }
+    }
 
     var body: some View {
         NavigationStack {
@@ -23,12 +29,12 @@ struct ExpiredAlertSheet: View {
                     banner
 
                     VStack(spacing: 10) {
-                        ForEach(medicines, id: \.uuid) { medicine in
+                        ForEach(remainingMedicines, id: \.uuid) { medicine in
                             row(medicine)
                         }
                     }
 
-                    Text(L10n.Expired.footnote)
+                    Text(subscriptionStore.isPro ? L10n.Expired.footnote : L10n.Medicines.deleteConfirmMessage)
                         .font(.footnote)
                         .foregroundStyle(Theme.Palette.muted)
                         .multilineTextAlignment(.center)
@@ -44,9 +50,27 @@ struct ExpiredAlertSheet: View {
                     Button(L10n.Expired.later) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(L10n.Expired.archiveAll, action: archiveAll)
-                        .disabled(medicines.isEmpty)
+                    Button(
+                        subscriptionStore.isPro ? L10n.Expired.archiveAll : L10n.Expired.deleteAll,
+                        action: handleAll
+                    )
+                    .disabled(remainingMedicines.isEmpty)
                 }
+            }
+            .confirmationDialog(
+                Text(L10n.Medicines.deleteConfirmTitle),
+                isPresented: $pendingDeleteAll,
+                titleVisibility: .visible
+            ) {
+                Button(L10n.Common.delete, role: .destructive) {
+                    for medicine in remainingMedicines {
+                        MedicineActions.delete(medicine, in: repository)
+                    }
+                    dismiss()
+                }
+                Button(L10n.Common.cancel, role: .cancel) {}
+            } message: {
+                Text(L10n.Medicines.deleteConfirmMessage)
             }
         }
         #if os(macOS)
@@ -60,7 +84,7 @@ struct ExpiredAlertSheet: View {
                 .font(.system(size: 38))
                 .foregroundStyle(Theme.Palette.danger)
 
-            Text(L10n.Expired.message(medicines.count))
+            Text(L10n.Expired.message(remainingMedicines.count))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Theme.Palette.ink)
                 .multilineTextAlignment(.center)
@@ -96,11 +120,12 @@ struct ExpiredAlertSheet: View {
 
             Button {
                 withAnimation(.snappy) {
-                    MedicineActions.archive(medicine, reason: .expired, in: modelContext)
+                    handleOne(medicine)
                 }
-                dismissIfHandled()
             } label: {
-                Label(L10n.Expired.archiveOne, systemImage: "archivebox.fill")
+                Label(
+                    subscriptionStore.isPro ? L10n.Expired.archiveOne : L10n.Common.delete,
+                    systemImage: subscriptionStore.isPro ? "archivebox.fill" : "trash.fill")
                     .labelStyle(.titleAndIcon)
             }
             .buttonStyle(.bordered)
@@ -112,20 +137,42 @@ struct ExpiredAlertSheet: View {
         .card(cornerRadius: 12, padding: 0, borderColor: Theme.Palette.danger.opacity(0.3))
     }
 
-    private func archiveAll() {
-        MedicineActions.archive(medicines, reason: .expired, in: modelContext)
-        dismiss()
+    private func handleAll() {
+        if subscriptionStore.isPro {
+            let result = MedicineActions.archive(remainingMedicines, reason: .expired, in: repository)
+            if case .failure(.requiresPro) = result {
+                appState.presentPaywall()
+            } else {
+                dismiss()
+            }
+        } else {
+            pendingDeleteAll = true
+        }
     }
 
-    /// Gdy archiwizacja objęła ostatni lek, nie ma już czego pokazywać.
-    private func dismissIfHandled() {
-        if medicines.allSatisfy(\.isArchived) {
-            dismiss()
+    private func handleOne(_ medicine: Medicine) {
+        if subscriptionStore.isPro {
+            let result = MedicineActions.archive(medicine, reason: .expired, in: repository)
+            if case .failure(.requiresPro) = result {
+                appState.presentPaywall()
+                return
+            }
+            handledUUIDs.insert(medicine.uuid)
+            if remainingMedicines.isEmpty { dismiss() }
+        } else {
+            MedicineActions.delete(medicine, in: repository)
+            handledUUIDs.insert(medicine.uuid)
+            if remainingMedicines.isEmpty { dismiss() }
         }
     }
 }
 
 #Preview {
-    ExpiredAlertSheet(medicines: PreviewData.samples.filter { $0.status() == .expired })
-        .modelContainer(PreviewData.container)
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return ExpiredAlertSheet(medicines: PreviewData.samples.filter { $0.status() == .expired })
+        .environment(AppState())
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .modelContainer(container)
 }

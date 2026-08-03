@@ -6,14 +6,17 @@
 import SwiftData
 import SwiftUI
 
-/// Ekran przeglądu: powitanie, trzy kafelki podsumowania, lista leków i panel
-/// z lekami po terminie - układ przeniesiony z szablonu webowego.
+/// Overview screen: greeting, three summary tiles, medicine list, and a panel
+/// for expired medicines — layout carried over from the web template.
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(SubscriptionStore.self) private var subscriptionStore
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var medicines: [Medicine]
+
+    @State private var medicinesPendingDeletion: [Medicine] = []
 
     private let now = Date.now
     private static let previewRowLimit = 5
@@ -45,6 +48,13 @@ struct DashboardView: View {
             .background(Theme.Palette.canvas)
             .navigationTitle(Text(L10n.App.title))
             .toolbar {
+                ToolbarItem {
+                    Button {
+                        appState.isPresentingSettings = true
+                    } label: {
+                        Label(L10n.Settings.title, systemImage: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         appState.isPresentingNewMedicine = true
@@ -56,10 +66,33 @@ struct DashboardView: View {
             .navigationDestination(for: Medicine.self) { medicine in
                 MedicineDetailView(medicine: medicine)
             }
+            .confirmationDialog(
+                Text(L10n.Medicines.deleteConfirmTitle),
+                isPresented: bulkDeleteDialogBinding,
+                titleVisibility: .visible
+            ) {
+                Button(L10n.Common.delete, role: .destructive) {
+                    for medicine in medicinesPendingDeletion {
+                        MedicineActions.delete(medicine, in: repository)
+                    }
+                    medicinesPendingDeletion = []
+                }
+                Button(L10n.Common.cancel, role: .cancel) {
+                    medicinesPendingDeletion = []
+                }
+            } message: {
+                Text(L10n.Medicines.deleteConfirmMessage)
+            }
         }
     }
 
-    // MARK: - Nagłówek
+    private var bulkDeleteDialogBinding: Binding<Bool> {
+        Binding(
+            get: { !medicinesPendingDeletion.isEmpty },
+            set: { if !$0 { medicinesPendingDeletion = [] } })
+    }
+
+    // MARK: - Header
 
     private var heading: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -80,7 +113,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Kafelki
+    // MARK: - Tiles
 
     private var statsGrid: some View {
         LazyVGrid(
@@ -116,7 +149,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Panele
+    // MARK: - Panels
 
     private var panels: some View {
         ViewThatFits(in: .horizontal) {
@@ -212,10 +245,9 @@ struct DashboardView: View {
                 }
 
                 Button(role: .destructive) {
-                    MedicineActions.archive(
-                        expiredMedicines, reason: .expired, in: modelContext)
+                    removeExpired(expiredMedicines)
                 } label: {
-                    Text(L10n.Expired.archiveAll)
+                    Text(subscriptionStore.isPro ? L10n.Expired.archiveAll : L10n.Expired.deleteAll)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -248,29 +280,49 @@ struct DashboardView: View {
             .buttonStyle(.plain)
 
             Button {
-                MedicineActions.archive(medicine, reason: .expired, in: modelContext)
+                removeExpired([medicine])
             } label: {
-                Image(systemName: "archivebox.fill")
+                Image(systemName: subscriptionStore.isPro ? "archivebox.fill" : "trash.fill")
                     .foregroundStyle(Theme.Palette.danger)
             }
             .buttonStyle(.borderless)
-            .accessibilityLabel(Text(L10n.Expired.archiveOne))
+            .accessibilityLabel(
+                Text(subscriptionStore.isPro ? L10n.Expired.archiveOne : L10n.Common.delete))
         }
         .padding(10)
         .background(
             Theme.softBackground(Theme.Palette.danger),
             in: .rect(cornerRadius: 10))
     }
+
+    private func removeExpired(_ medicines: [Medicine]) {
+        if subscriptionStore.isPro {
+            let result = MedicineActions.archive(medicines, reason: .expired, in: repository)
+            if case .failure(.requiresPro) = result {
+                appState.presentPaywall()
+            }
+        } else {
+            medicinesPendingDeletion = medicines
+        }
+    }
 }
 
 #Preview {
-    DashboardView()
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return DashboardView()
         .environment(AppState())
-        .modelContainer(PreviewData.container)
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .modelContainer(container)
 }
 
-#Preview("Pusta apteczka") {
-    DashboardView()
+#Preview("Empty cabinet") {
+    let container = PreviewData.emptyContainer
+    let services = AppServices(modelContainer: container)
+    return DashboardView()
         .environment(AppState())
-        .modelContainer(PreviewData.emptyContainer)
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .modelContainer(container)
 }

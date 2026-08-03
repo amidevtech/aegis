@@ -6,11 +6,11 @@
 import Foundation
 import SwiftData
 
-/// Predykaty i kolejności sortowania współdzielone przez ekrany.
+/// Predicates and sort orders shared across screens.
 ///
-/// Predykaty celowo nie zawierają dat - `@Query` zamraża je w chwili utworzenia widoku,
-/// więc granica "dzisiaj" szybko by się zdezaktualizowała. Filtrowanie po terminach
-/// odbywa się na już pobranych, posortowanych danych.
+/// Predicates intentionally omit dates — `@Query` freezes them when the view is
+/// created, so a "today" boundary would go stale quickly. Expiry filtering
+/// happens on already-fetched, sorted data.
 nonisolated enum MedicineQueries {
 
     static var active: Predicate<Medicine> {

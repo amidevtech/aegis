@@ -6,11 +6,11 @@
 import Foundation
 
 nonisolated extension String {
-    /// Postać do porównań w wyszukiwarce: bez wielkości liter i bez znaków diakrytycznych.
+    /// Normalized form for search comparisons: case- and diacritic-insensitive.
     ///
-    /// Systemowe składanie diakrytyków nie rozkłada "ł" na "l", bo to osobna litera,
-    /// a nie "l" z ogonkiem. Bez ręcznej podmiany szukanie "gardla" nie znalazłoby
-    /// "ból gardła".
+    /// System diacritic folding does not map "ł" to "l", because it is a separate
+    /// letter rather than an "l" with a diacritic. Without a manual replacement,
+    /// searching for "gardla" would not match "ból gardła".
     var searchNormalized: String {
         folding(
             options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive],
@@ -26,10 +26,10 @@ nonisolated extension String {
     }
 }
 
-/// Token zawężający wyszukiwanie do jednego pola.
+/// Token that narrows search to a single field.
 ///
-/// Wpisany tekst przeszukuje wszystkie pola naraz; token pozwala doprecyzować,
-/// że chodzi akurat o osobę, dolegliwość albo substancję czynną.
+/// Free text searches every field at once; a token lets the user specify
+/// a person, indication, or active substance.
 nonisolated struct MedicineSearchToken: Identifiable, Hashable {
     enum Field: String, Hashable {
         case person
@@ -68,7 +68,7 @@ nonisolated struct MedicineSearchToken: Identifiable, Hashable {
 }
 
 extension Medicine {
-    /// Wyszukiwanie tekstowe obejmuje wszystkie pola opisowe naraz.
+    /// Free-text search covers every descriptive field at once.
     func matches(freeText query: String) -> Bool {
         let fields = [name, activeSubstance, personName, indication, quantity, notes]
         return fields.contains { $0.searchContains(query) }
@@ -80,7 +80,7 @@ extension Medicine {
 }
 
 extension Collection where Element == Medicine {
-    /// Podpowiedzi tokenów budowane z wartości, które użytkownik już wpisał.
+    /// Token suggestions built from values the user has already entered.
     func searchTokenSuggestions(matching query: String, limit: Int = 6) -> [MedicineSearchToken] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return [] }
@@ -105,7 +105,7 @@ extension Collection where Element == Medicine {
         return Array(suggestions.prefix(limit))
     }
 
-    /// Unikalne, posortowane wartości pola - używane jako podpowiedzi w formularzu.
+    /// Unique, sorted field values — used as form suggestions.
     func uniqueValues(for keyPath: KeyPath<Medicine, String>) -> [String] {
         var seen = Set<String>()
         var values: [String] = []

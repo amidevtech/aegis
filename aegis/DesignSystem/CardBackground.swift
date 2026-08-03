@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Biała karta z obramowaniem i miękkim cieniem - odpowiednik paneli z szablonu webowego.
+/// White card with border and soft shadow — counterpart of the web template panels.
 struct CardBackground: ViewModifier {
     var cornerRadius: CGFloat = Theme.Metrics.cardCornerRadius
     var padding: CGFloat = Theme.Metrics.cardPadding
@@ -36,7 +36,7 @@ extension View {
     }
 }
 
-/// Kwadratowa ikona na delikatnym tle, używana przy wierszach leków i kafelkach.
+/// Square icon on a soft tinted background, used on medicine rows and stat tiles.
 struct SymbolTile: View {
     let systemName: String
     var tint: Color = Theme.Palette.brand
@@ -54,7 +54,7 @@ struct SymbolTile: View {
     }
 }
 
-/// Zaokrąglony znacznik statusu, odpowiednik `.tag` z szablonu.
+/// Rounded status badge, counterpart of `.tag` in the template.
 struct StatusTag: View {
     let text: LocalizedStringResource
     let tint: Color
@@ -77,7 +77,7 @@ struct StatusTag: View {
     }
 }
 
-#Preview("Karty i znaczniki") {
+#Preview("Cards and badges") {
     VStack(spacing: 16) {
         HStack(spacing: 12) {
             SymbolTile(systemName: "pills.fill")

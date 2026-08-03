@@ -6,15 +6,18 @@
 import SwiftData
 import SwiftUI
 
-/// Szczegóły leku wraz z akcjami: otwarcie opakowania, edycja i archiwizacja.
+/// Medicine details with actions: open package, edit, and archive.
 struct MedicineDetailView: View {
     @Bindable var medicine: Medicine
 
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
 
     @State private var isPresentingEditor = false
     @State private var isPresentingArchiveOptions = false
+    @State private var isPresentingDeleteConfirm = false
 
     private let now = Date.now
 
@@ -23,7 +26,7 @@ struct MedicineDetailView: View {
     private var openedBinding: Binding<Bool> {
         Binding(
             get: { medicine.isOpened },
-            set: { MedicineActions.setOpened($0, for: medicine, in: modelContext) })
+            set: { MedicineActions.setOpened($0, for: medicine, in: repository) })
     }
 
     var body: some View {
@@ -59,20 +62,31 @@ struct MedicineDetailView: View {
 
             Section {
                 if medicine.isArchived {
-                    Button {
-                        MedicineActions.restore(medicine, in: modelContext)
-                    } label: {
-                        Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
+                    if subscriptionStore.isPro {
+                        Button {
+                            let result = MedicineActions.restore(medicine, in: repository)
+                            if case .failure(.requiresPro) = result {
+                                appState.presentPaywall()
+                            }
+                        } label: {
+                            Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
+                        }
                     }
-                } else {
+                } else if subscriptionStore.isPro {
                     Button(role: .destructive) {
                         isPresentingArchiveOptions = true
                     } label: {
                         Label(L10n.Detail.archive, systemImage: "archivebox.fill")
                     }
+                } else {
+                    Button(role: .destructive) {
+                        isPresentingDeleteConfirm = true
+                    } label: {
+                        Label(L10n.Common.delete, systemImage: "trash.fill")
+                    }
                 }
             } footer: {
-                Text(L10n.Expired.footnote)
+                Text(subscriptionStore.isPro ? L10n.Expired.footnote : L10n.Medicines.deleteConfirmMessage)
             }
         }
         .formStyle(.grouped)
@@ -96,15 +110,32 @@ struct MedicineDetailView: View {
         ) {
             ForEach(ArchiveReason.allCases) { reason in
                 Button(reason.label) {
-                    MedicineActions.archive(medicine, reason: reason, in: modelContext)
-                    dismiss()
+                    let result = MedicineActions.archive(medicine, reason: reason, in: repository)
+                    if case .failure(.requiresPro) = result {
+                        appState.presentPaywall()
+                    } else {
+                        dismiss()
+                    }
                 }
             }
             Button(L10n.Common.cancel, role: .cancel) {}
         }
+        .confirmationDialog(
+            Text(L10n.Medicines.deleteConfirmTitle),
+            isPresented: $isPresentingDeleteConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Common.delete, role: .destructive) {
+                MedicineActions.delete(medicine, in: repository)
+                dismiss()
+            }
+            Button(L10n.Common.cancel, role: .cancel) {}
+        } message: {
+            Text(L10n.Medicines.deleteConfirmMessage)
+        }
     }
 
-    // MARK: - Sekcje
+    // MARK: - Sections
 
     private var header: some View {
         HStack(alignment: .top, spacing: 14) {
@@ -220,8 +251,13 @@ struct MedicineDetailView: View {
 }
 
 #Preview {
-    NavigationStack {
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return NavigationStack {
         MedicineDetailView(medicine: PreviewData.samples[2])
     }
-    .modelContainer(PreviewData.container)
+    .environment(AppState())
+    .environment(services.subscriptionStore)
+    .environment(services.repository)
+    .modelContainer(container)
 }

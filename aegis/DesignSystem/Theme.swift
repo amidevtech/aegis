@@ -5,11 +5,11 @@
 
 import SwiftUI
 
-/// Paleta i metryki wspólne dla wszystkich ekranów.
-/// Kolory pochodzą z szablonu webowego i mają warianty dla trybu ciemnego.
+/// Shared palette and metrics for every screen.
+/// Colors come from the web template and include dark-mode variants.
 ///
-/// Typ celowo pozostaje związany z głównym aktorem - symbole kolorów generowane
-/// z katalogu zasobów też takie są.
+/// The type stays main-actor bound on purpose — color symbols generated
+/// from the asset catalog are main-actor too.
 enum Theme {
 
     enum Palette {
@@ -34,7 +34,7 @@ enum Theme {
         static let symbolSize: CGFloat = 46
     }
 
-    /// Delikatne tło pod ikoną w kolorze akcentu, tak jak `.medicine-symbol` w szablonie.
+    /// Soft accent-tinted background under an icon, matching `.medicine-symbol` in the template.
     static func softBackground(_ color: Color) -> Color {
         color.opacity(0.14)
     }

@@ -2,30 +2,29 @@
 //  aegisApp.swift
 //  aegis
 //
-//  Created by Bartosz Pater on 03/08/2026.
-//
 
+import CloudKit
 import SwiftData
 import SwiftUI
 import UserNotifications
 
-/// Przełączniki magazynu danych.
-///
-/// `isCloudKitEnabled = false` pozwala instalować aplikację lokalnie bez płatnego
-/// konta deweloperskiego Apple. Kod CloudKit zostaje - po testach ustaw `true`
-/// i przywróć entitlementy z `aegis.CloudKit.entitlements`.
-enum StorageOptions {
-    static let isCloudKitEnabled = false
-}
-
 @main
 struct aegisApp: App {
+    #if canImport(UIKit) && !os(watchOS)
+    @UIApplicationDelegateAdaptor(AegisAppDelegate.self) private var appDelegate
+    #elseif os(macOS)
+    @NSApplicationDelegateAdaptor(AegisAppDelegate.self) private var appDelegate
+    #endif
+
     @State private var appState = AppState()
 
     private let modelContainer: ModelContainer
+    private let services: AppServices
 
     init() {
-        modelContainer = Self.makeModelContainer()
+        let container = Self.makeModelContainer()
+        modelContainer = container
+        services = AppServices(modelContainer: container)
         UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
     }
 
@@ -33,7 +32,20 @@ struct aegisApp: App {
         WindowGroup {
             RootView()
                 .environment(appState)
+                .environment(services.subscriptionStore)
+                .environment(services.repository)
+                .environment(services.cloudSync)
                 .tint(Theme.Palette.brand)
+                .task {
+                    installShareAcceptanceHandler()
+                    services.subscriptionStore.startListeningForTransactions()
+                    await services.subscriptionStore.loadProducts()
+                    await services.subscriptionStore.refreshEntitlements()
+                    await services.repository.syncProState()
+                }
+                .onChange(of: services.subscriptionStore.isPro) { _, _ in
+                    Task { await services.repository.syncProState() }
+                }
         }
         .modelContainer(modelContainer)
         .commands {
@@ -55,18 +67,33 @@ struct aegisApp: App {
         #endif
     }
 
-    /// Przy włączonym CloudKit najpierw próbuje magazynu iCloud, a przy niepowodzeniu
-    /// schodzi do bazy lokalnej. Przy wyłączonym CloudKit od razu idzie lokalnie.
+    private func installShareAcceptanceHandler() {
+        #if canImport(UIKit) && !os(watchOS)
+        AegisSceneDelegate.onAcceptShare = { [services] metadata in
+            Task {
+                try? await services.cloudSync.acceptShare(metadata: metadata)
+                await services.repository.syncProState()
+            }
+        }
+        #elseif os(macOS)
+        AegisAppDelegate.onAcceptShare = { [services] metadata in
+            Task {
+                try? await services.cloudSync.acceptShare(metadata: metadata)
+                await services.repository.syncProState()
+            }
+        }
+        #endif
+    }
+
+    /// Free and Pro both use local SwiftData. CloudKit is a custom sync
+    /// (`CloudSyncService`) enabled only with a Pro entitlement — we do not use
+    /// built-in `cloudKitDatabase: .automatic` (no CKShare support).
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([Medicine.self])
-
-        var candidates: [ModelConfiguration] = []
-        if StorageOptions.isCloudKitEnabled {
-            candidates.append(ModelConfiguration(schema: schema, cloudKitDatabase: .automatic))
-        }
-        candidates.append(ModelConfiguration(schema: schema, cloudKitDatabase: .none))
-        candidates.append(
-            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+        let candidates: [ModelConfiguration] = [
+            ModelConfiguration(schema: schema, cloudKitDatabase: .none),
+            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        ]
 
         for configuration in candidates {
             if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
@@ -74,12 +101,12 @@ struct aegisApp: App {
             }
         }
 
-        fatalError("Nie udało się utworzyć magazynu danych w żadnej konfiguracji")
+        fatalError("Failed to create a data store in any configuration")
     }
 }
 
-/// Pokazuje powiadomienie także wtedy, gdy aplikacja jest akurat na wierzchu -
-/// bez tego przypomnienie o terminie zostałoby po cichu pominięte.
+/// Presents notifications even while the app is in the foreground —
+/// otherwise an expiry reminder would be silently skipped.
 final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationPresenter()
 

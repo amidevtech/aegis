@@ -30,7 +30,7 @@ enum AppTab: String, Hashable, CaseIterable, Identifiable {
     }
 }
 
-/// Zawężenie listy leków wybierane kafelkami na ekranie przeglądu.
+/// Medicine list filter chosen via overview tiles.
 enum MedicineListFilter: String, Hashable, CaseIterable, Identifiable {
     case all
     case opened
@@ -55,16 +55,18 @@ enum MedicineListFilter: String, Hashable, CaseIterable, Identifiable {
     }
 }
 
-/// Stan nawigacji współdzielony przez zakładki, arkusze i menu na Macu.
+/// Navigation state shared across tabs, sheets, and the Mac menu.
 @Observable
 final class AppState {
     var selectedTab: AppTab = .overview
     var medicinesFilter: MedicineListFilter = .all
     var isPresentingNewMedicine = false
+    var isPresentingPaywall = false
+    var isPresentingSettings = false
 
-    /// Prośba o przeniesienie kursora do pola wyszukiwania (skrót Command-F).
-    /// Flaga, a nie zdarzenie, bo lista leków może dopiero powstawać po przełączeniu
-    /// zakładki i przegapiłaby jednorazowy sygnał.
+    /// Request to move focus to the search field (Command-F shortcut).
+    /// Stored as a flag rather than an event, because the medicines list may still
+    /// be appearing after a tab switch and would miss a one-shot signal.
     var isSearchFocusRequested = false
 
     func showMedicines(filter: MedicineListFilter) {
@@ -75,5 +77,9 @@ final class AppState {
     func focusSearch() {
         selectedTab = .medicines
         isSearchFocusRequested = true
+    }
+
+    func presentPaywall() {
+        isPresentingPaywall = true
     }
 }

@@ -5,13 +5,13 @@
 
 import Foundation
 
-/// Stan ważności leku wyliczany z obowiązującego terminu.
+/// Medicine expiry status derived from the effective date.
 nonisolated enum MedicineStatus: String, CaseIterable, Identifiable, Hashable, Sendable {
     case valid
     case expiringSoon
     case expired
 
-    /// Ile dni przed terminem lek trafia do sekcji "wkrótce wygasają".
+    /// How many days before expiry a medicine enters the "expiring soon" section.
     static let soonThresholdInDays = 30
 
     var id: String { rawValue }

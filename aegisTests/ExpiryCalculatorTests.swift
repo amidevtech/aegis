@@ -8,8 +8,8 @@ import Testing
 
 @testable import aegis
 
-/// Testy liczenia terminów. Kalendarz jest przypięty do UTC, żeby wynik nie zależał
-/// od strefy czasowej maszyny, na której lecą testy.
+/// Expiry calculation tests. The calendar is pinned to UTC so results do not
+/// depend on the timezone of the machine running the tests.
 struct ExpiryCalculatorTests {
 
     private let calendar: Calendar = {
@@ -22,7 +22,7 @@ struct ExpiryCalculatorTests {
         calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? .distantPast
     }
 
-    @Test("Termin po otwarciu liczy się od daty otwarcia")
+    @Test("Post-opening expiry is counted from the opening date")
     func openedExpiryCountsFromOpeningDate() {
         let result = ExpiryCalculator.openedExpiry(
             openedAt: date(2026, 3, 1),
@@ -33,7 +33,7 @@ struct ExpiryCalculatorTests {
         #expect(result == date(2026, 3, 31))
     }
 
-    @Test("Ręcznie wybrana data ma pierwszeństwo przed liczbą dni")
+    @Test("A manually chosen date takes priority over the day count")
     func overrideWinsOverDayCount() {
         let result = ExpiryCalculator.openedExpiry(
             openedAt: date(2026, 3, 1),
@@ -44,7 +44,7 @@ struct ExpiryCalculatorTests {
         #expect(result == date(2026, 4, 15))
     }
 
-    @Test("Bez daty otwarcia albo bez liczby dni nie ma terminu po otwarciu")
+    @Test("Without an opening date or day count there is no post-opening expiry")
     func openedExpiryRequiresBothInputs() {
         #expect(ExpiryCalculator.openedExpiry(
             openedAt: nil, daysAfterOpening: 30, override: nil, calendar: calendar) == nil)
@@ -56,7 +56,7 @@ struct ExpiryCalculatorTests {
             calendar: calendar) == nil)
     }
 
-    @Test("Obowiązuje wcześniejszy z dwóch terminów")
+    @Test("The earlier of the two dates is effective")
     func effectiveExpiryPicksEarlierDate() {
         let result = ExpiryCalculator.effectiveExpiry(
             packageExpiry: date(2027, 1, 1),
@@ -69,7 +69,7 @@ struct ExpiryCalculatorTests {
         #expect(result == date(2026, 3, 15))
     }
 
-    @Test("Gdy opakowanie kończy się wcześniej, otwarcie nic nie zmienia")
+    @Test("When the package expires sooner, opening does not change anything")
     func packageExpiryWinsWhenEarlier() {
         let result = ExpiryCalculator.effectiveExpiry(
             packageExpiry: date(2026, 3, 5),
@@ -82,7 +82,7 @@ struct ExpiryCalculatorTests {
         #expect(result == date(2026, 3, 5))
     }
 
-    @Test("Zamknięte opakowanie ignoruje ustawienia po otwarciu")
+    @Test("A closed package ignores post-opening settings")
     func closedPackageIgnoresOpeningSettings() {
         let result = ExpiryCalculator.effectiveExpiry(
             packageExpiry: date(2027, 1, 1),
@@ -95,7 +95,7 @@ struct ExpiryCalculatorTests {
         #expect(result == date(2027, 1, 1))
     }
 
-    @Test("Lek jest ważny przez cały dzień widniejący na opakowaniu")
+    @Test("A medicine stays valid through the whole day printed on the package")
     func statusOnTheExpiryDayIsNotExpired() {
         let today = date(2026, 3, 10)
 
@@ -105,7 +105,7 @@ struct ExpiryCalculatorTests {
             effectiveExpiry: date(2026, 3, 9), now: today, calendar: calendar) == .expired)
     }
 
-    @Test("Granica sekcji wkrótce wygasają to 30 dni")
+    @Test("The expiring-soon section boundary is 30 days")
     func statusThresholds() {
         let today = date(2026, 3, 10)
 
@@ -115,7 +115,7 @@ struct ExpiryCalculatorTests {
             effectiveExpiry: date(2026, 4, 10), now: today, calendar: calendar) == .valid)
     }
 
-    @Test("Liczba dni po terminie jest ujemna")
+    @Test("Days remaining is negative after expiry")
     func daysRemainingGoesNegativeAfterExpiry() {
         let today = date(2026, 3, 10)
 
@@ -127,7 +127,7 @@ struct ExpiryCalculatorTests {
             until: date(2026, 3, 4), now: today, calendar: calendar) == -6)
     }
 
-    @Test("Pora dnia nie wpływa na liczenie dni")
+    @Test("Time of day does not affect the day count")
     func timeOfDayDoesNotAffectDayCount() {
         let morning = calendar.date(
             from: DateComponents(year: 2026, month: 3, day: 10, hour: 7)) ?? .distantPast

@@ -5,15 +5,15 @@
 
 import Foundation
 
-/// Czysta logika terminów ważności - bez SwiftData i bez SwiftUI, żeby dała się
-/// testować w oderwaniu od reszty aplikacji.
+/// Pure expiry-date logic — no SwiftData and no SwiftUI, so it can be tested
+/// apart from the rest of the app.
 ///
-/// Wszystkie daty są normalizowane do początku dnia. Lek z terminem "3 sierpnia"
-/// jest ważny przez cały 3 sierpnia i traci ważność dopiero 4 sierpnia.
+/// All dates are normalized to the start of the day. A medicine dated "3 August"
+/// stays valid through that whole day and expires only on 4 August.
 nonisolated enum ExpiryCalculator {
 
-    /// Termin liczony od momentu otwarcia opakowania.
-    /// Ręcznie wybrana data ma pierwszeństwo przed liczbą dni.
+    /// Expiry counted from the moment the package was opened.
+    /// A manually chosen date takes priority over a day count.
     static func openedExpiry(
         openedAt: Date?,
         daysAfterOpening: Int?,
@@ -27,7 +27,7 @@ nonisolated enum ExpiryCalculator {
         return calendar.date(byAdding: .day, value: days, to: calendar.startOfDay(for: openedAt))
     }
 
-    /// Wcześniejszy z dwóch terminów: tego z opakowania i tego liczonego od otwarcia.
+    /// Earlier of the two dates: package expiry and post-opening expiry.
     static func effectiveExpiry(
         packageExpiry: Date,
         isOpened: Bool,
@@ -47,8 +47,8 @@ nonisolated enum ExpiryCalculator {
         return min(package, opened)
     }
 
-    /// Liczba pełnych dni dzielących dziś od podanego terminu.
-    /// Wartość ujemna oznacza, że termin już minął.
+    /// Whole days between today and the given expiry.
+    /// A negative value means the date has already passed.
     static func daysRemaining(
         until expiry: Date,
         now: Date = .now,
@@ -70,12 +70,12 @@ nonisolated enum ExpiryCalculator {
         return .valid
     }
 
-    /// Granica używana w zapytaniach SwiftData: wszystko wcześniejsze jest po terminie.
+    /// Boundary used in SwiftData queries: anything earlier is expired.
     static func startOfToday(now: Date = .now, calendar: Calendar = .current) -> Date {
         calendar.startOfDay(for: now)
     }
 
-    /// Granica sekcji "wkrótce wygasają".
+    /// Boundary for the "expiring soon" section.
     static func soonThresholdDate(now: Date = .now, calendar: Calendar = .current) -> Date {
         calendar.date(
             byAdding: .day,

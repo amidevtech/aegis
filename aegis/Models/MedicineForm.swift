@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// Postać leku. W bazie zapisywany jest stabilny `rawValue`, żeby zmiana języka
-/// interfejsu nie naruszyła danych zsynchronizowanych przez iCloud.
+/// Medicine form. A stable `rawValue` is stored so changing the UI language
+/// does not break data synced through iCloud.
 nonisolated enum MedicineForm: String, CaseIterable, Identifiable, Hashable, Sendable {
     case tablet
     case capsule
@@ -42,42 +42,42 @@ nonisolated enum MedicineForm: String, CaseIterable, Identifiable, Hashable, Sen
         switch self {
         case .tablet:
             LocalizedStringResource("medicine_form.tablet", defaultValue: "Tabletki",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .capsule:
             LocalizedStringResource("medicine_form.capsule", defaultValue: "Kapsułki",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .syrup:
             LocalizedStringResource("medicine_form.syrup", defaultValue: "Syrop",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .drops:
             LocalizedStringResource("medicine_form.drops", defaultValue: "Krople",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .eyeDrops:
             LocalizedStringResource("medicine_form.eye_drops", defaultValue: "Krople do oczu",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .ointment:
             LocalizedStringResource("medicine_form.ointment", defaultValue: "Maść / krem",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .suppository:
             LocalizedStringResource("medicine_form.suppository", defaultValue: "Czopki",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .spray:
             LocalizedStringResource("medicine_form.spray", defaultValue: "Spray",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .inhaler:
             LocalizedStringResource("medicine_form.inhaler", defaultValue: "Inhalator",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .injection:
             LocalizedStringResource("medicine_form.injection", defaultValue: "Zastrzyk",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         case .other:
             LocalizedStringResource("medicine_form.other", defaultValue: "Inne",
-                                    comment: "Postać leku")
+                                    comment: "Medicine form")
         }
     }
 
-    /// Typowa przydatność po otwarciu w dniach. `nil` oznacza, że dla tej postaci
-    /// nie ma powszechnej normy i termin z opakowania obowiązuje dalej.
+    /// Typical post-opening shelf life in days. `nil` means there is no common
+    /// rule for this form and the package expiry still applies.
     var suggestedDaysAfterOpening: Int? {
         switch self {
         case .syrup: 30

@@ -6,10 +6,9 @@
 import SwiftData
 import SwiftUI
 
-/// Historia apteczki. Leki tu trafiają zamiast być kasowane, więc zawsze wiadomo,
-/// co i komu było kiedyś przepisane. Trwałe usunięcie jest możliwe tylko stąd.
+/// Cabinet history (Pro only). Medicines land here instead of being deleted.
 struct ArchiveView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
 
     @Query(filter: MedicineQueries.archived, sort: MedicineQueries.byArchiveDate)
     private var medicines: [Medicine]
@@ -38,7 +37,7 @@ struct ArchiveView: View {
                     presenting: medicinePendingDeletion
                 ) { medicine in
                     Button(L10n.Common.delete, role: .destructive) {
-                        MedicineActions.deletePermanently(medicine, in: modelContext)
+                        MedicineActions.delete(medicine, in: repository)
                         medicinePendingDeletion = nil
                     }
                     Button(L10n.Common.cancel, role: .cancel) {
@@ -85,7 +84,7 @@ struct ArchiveView: View {
                     }
                     .swipeActions(edge: .leading) {
                         Button {
-                            MedicineActions.restore(medicine, in: modelContext)
+                            _ = MedicineActions.restore(medicine, in: repository)
                         } label: {
                             Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
                         }
@@ -153,6 +152,11 @@ struct ArchiveView: View {
 }
 
 #Preview {
-    ArchiveView()
-        .modelContainer(PreviewData.container)
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return ArchiveView()
+        .environment(AppState())
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .modelContainer(container)
 }

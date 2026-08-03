@@ -6,16 +6,19 @@
 import SwiftData
 import SwiftUI
 
-/// Nawigacja główna. `sidebarAdaptable` daje pasek zakładek na iPhonie,
-/// a boczny panel na iPadzie i Macu - najbliżej układu z szablonu webowego.
+/// Root navigation. `sidebarAdaptable` gives a tab bar on iPhone
+/// and a sidebar on iPad and Mac — closest to the web template layout.
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(CloudSyncService.self) private var cloudSync
     @Environment(\.scenePhase) private var scenePhase
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var activeMedicines: [Medicine]
 
-    /// Znacznik ostatniego pokazania arkusza, żeby nie wyskakiwał przy każdym powrocie do apki.
+    /// Timestamp of the last sheet presentation, so it does not pop up on every return to the app.
     @AppStorage("lastExpiredAlertTimestamp") private var lastAlertTimestamp: Double = 0
 
     @State private var isPresentingExpiredAlert = false
@@ -42,10 +45,12 @@ struct RootView: View {
                 Label(AppTab.medicines.label, systemImage: AppTab.medicines.symbolName)
             }
 
-            Tab(value: AppTab.archive) {
-                ArchiveView()
-            } label: {
-                Label(AppTab.archive.label, systemImage: AppTab.archive.symbolName)
+            if subscriptionStore.isPro {
+                Tab(value: AppTab.archive) {
+                    ArchiveView()
+                } label: {
+                    Label(AppTab.archive.label, systemImage: AppTab.archive.symbolName)
+                }
             }
         }
         .tabViewStyle(.sidebarAdaptable)
@@ -55,6 +60,12 @@ struct RootView: View {
         }
         .sheet(isPresented: $isPresentingExpiredAlert) {
             ExpiredAlertSheet(medicines: expiredMedicines)
+        }
+        .sheet(isPresented: $appState.isPresentingPaywall) {
+            PaywallView()
+        }
+        .sheet(isPresented: $appState.isPresentingSettings) {
+            SettingsView()
         }
         .task {
             guard !hasEvaluatedOnLaunch else { return }
@@ -66,6 +77,9 @@ struct RootView: View {
             switch phase {
             case .active:
                 evaluateExpiredAlert(isColdLaunch: false)
+                if subscriptionStore.isPro {
+                    Task { await cloudSync.pullNow() }
+                }
             case .background:
                 let medicines = activeMedicines
                 Task { await NotificationService.shared.sync(medicines: medicines) }
@@ -73,9 +87,14 @@ struct RootView: View {
                 break
             }
         }
+        .onChange(of: subscriptionStore.isPro) { _, isPro in
+            if !isPro, appState.selectedTab == .archive {
+                appState.selectedTab = .overview
+            }
+        }
     }
 
-    /// Arkusz pojawia się przy zimnym starcie oraz przy pierwszym otwarciu w danym dniu.
+    /// The sheet appears on cold launch and on the first open of the day.
     private func evaluateExpiredAlert(isColdLaunch: Bool) {
         guard !isPresentingExpiredAlert, !expiredMedicines.isEmpty else { return }
 
@@ -90,7 +109,12 @@ struct RootView: View {
 }
 
 #Preview {
-    RootView()
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return RootView()
         .environment(AppState())
-        .modelContainer(PreviewData.container)
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .environment(services.cloudSync)
+        .modelContainer(container)
 }
