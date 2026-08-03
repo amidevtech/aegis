@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		83BD20C53020794C00DE3770 /* aegis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = aegis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83BD20C53020794C00DE3770 /* Aegis Medicine Cabinet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Aegis Medicine Cabinet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		83BD20D43020794D00DE3770 /* aegisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aegisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83BD20DE3020794D00DE3770 /* aegisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = aegisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,7 +85,7 @@
 		83BD20C63020794C00DE3770 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				83BD20C53020794C00DE3770 /* aegis.app */,
+				83BD20C53020794C00DE3770 /* Aegis Medicine Cabinet.app */,
 				83BD20D43020794D00DE3770 /* aegisTests.xctest */,
 				83BD20DE3020794D00DE3770 /* aegisUITests.xctest */,
 			);
@@ -114,7 +114,7 @@
 			packageProductDependencies = (
 			);
 			productName = aegis;
-			productReference = 83BD20C53020794C00DE3770 /* aegis.app */;
+			productReference = 83BD20C53020794C00DE3770 /* Aegis Medicine Cabinet.app */;
 			productType = "com.apple.product-type.application";
 		};
 		83BD20D33020794D00DE3770 /* aegisTests */ = {
@@ -415,7 +415,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.amidevtech.aegis;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Aegis Medicine Cabinet";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -463,7 +463,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.amidevtech.aegis;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Aegis Medicine Cabinet";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
