@@ -9,6 +9,15 @@ import SwiftData
 import SwiftUI
 import UserNotifications
 
+/// Przełączniki magazynu danych.
+///
+/// `isCloudKitEnabled = false` pozwala instalować aplikację lokalnie bez płatnego
+/// konta deweloperskiego Apple. Kod CloudKit zostaje - po testach ustaw `true`
+/// i przywróć entitlementy z `aegis.CloudKit.entitlements`.
+enum StorageOptions {
+    static let isCloudKitEnabled = false
+}
+
 @main
 struct aegisApp: App {
     @State private var appState = AppState()
@@ -46,17 +55,18 @@ struct aegisApp: App {
         #endif
     }
 
-    /// Najpierw próbujemy magazynu synchronizowanego przez iCloud. Bez konta
-    /// developerskiego albo bez zalogowanego iCloud taka konfiguracja się nie uda,
-    /// więc schodzimy do bazy lokalnej - aplikacja ma działać w obu przypadkach.
+    /// Przy włączonym CloudKit najpierw próbuje magazynu iCloud, a przy niepowodzeniu
+    /// schodzi do bazy lokalnej. Przy wyłączonym CloudKit od razu idzie lokalnie.
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([Medicine.self])
 
-        let candidates: [ModelConfiguration] = [
-            ModelConfiguration(schema: schema, cloudKitDatabase: .automatic),
-            ModelConfiguration(schema: schema, cloudKitDatabase: .none),
-            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-        ]
+        var candidates: [ModelConfiguration] = []
+        if StorageOptions.isCloudKitEnabled {
+            candidates.append(ModelConfiguration(schema: schema, cloudKitDatabase: .automatic))
+        }
+        candidates.append(ModelConfiguration(schema: schema, cloudKitDatabase: .none))
+        candidates.append(
+            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none))
 
         for configuration in candidates {
             if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
