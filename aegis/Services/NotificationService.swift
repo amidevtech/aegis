@@ -43,6 +43,11 @@ final class NotificationService {
     /// Pyta o zgodę tylko przy pierwszym użyciu. Zwraca `true`, gdy wolno planować.
     @discardableResult
     func requestAuthorizationIfNeeded() async -> Bool {
+        // Unit testy nie powinny odpalać systemowego dialogu powiadomień.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return false
+        }
+
         await refreshAuthorizationStatus()
         switch authorizationStatus {
         case .notDetermined:
@@ -83,6 +88,9 @@ final class NotificationService {
     }
 
     func cancel(for medicine: Medicine) {
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return
+        }
         center.removePendingNotificationRequests(
             withIdentifiers: Self.leadTimesInDays.map { identifier(for: medicine, leadDays: $0) })
     }

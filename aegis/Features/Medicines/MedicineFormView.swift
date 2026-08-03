@@ -17,7 +17,7 @@ struct MedicineFormView: View {
     let mode: Mode
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
 
     @Query(sort: MedicineQueries.byName) private var allMedicines: [Medicine]
 
@@ -179,22 +179,14 @@ struct MedicineFormView: View {
     }
 
     private func save() {
-        let medicine: Medicine
         switch mode {
         case .create:
             let newMedicine = Medicine()
             draft.apply(to: newMedicine)
-            modelContext.insert(newMedicine)
-            medicine = newMedicine
+            repository.upsert(newMedicine, isNew: true)
         case .edit(let existing):
             draft.apply(to: existing)
-            medicine = existing
-        }
-
-        try? modelContext.save()
-
-        Task {
-            await NotificationService.shared.reschedule(for: medicine)
+            repository.upsert(existing, isNew: false)
         }
 
         dismiss()
@@ -202,11 +194,17 @@ struct MedicineFormView: View {
 }
 
 #Preview("Nowy lek") {
-    MedicineFormView(mode: .create)
-        .modelContainer(PreviewData.container)
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return MedicineFormView(mode: .create)
+        .environment(services.repository)
+        .modelContainer(container)
 }
 
 #Preview("Edycja") {
-    MedicineFormView(mode: .edit(PreviewData.samples[2]))
-        .modelContainer(PreviewData.container)
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return MedicineFormView(mode: .edit(PreviewData.samples[2]))
+        .environment(services.repository)
+        .modelContainer(container)
 }

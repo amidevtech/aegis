@@ -10,6 +10,9 @@ import SwiftUI
 /// a boczny panel na iPadzie i Macu - najbliżej układu z szablonu webowego.
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(CloudSyncService.self) private var cloudSync
     @Environment(\.scenePhase) private var scenePhase
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
@@ -42,10 +45,12 @@ struct RootView: View {
                 Label(AppTab.medicines.label, systemImage: AppTab.medicines.symbolName)
             }
 
-            Tab(value: AppTab.archive) {
-                ArchiveView()
-            } label: {
-                Label(AppTab.archive.label, systemImage: AppTab.archive.symbolName)
+            if subscriptionStore.isPro {
+                Tab(value: AppTab.archive) {
+                    ArchiveView()
+                } label: {
+                    Label(AppTab.archive.label, systemImage: AppTab.archive.symbolName)
+                }
             }
         }
         .tabViewStyle(.sidebarAdaptable)
@@ -55,6 +60,12 @@ struct RootView: View {
         }
         .sheet(isPresented: $isPresentingExpiredAlert) {
             ExpiredAlertSheet(medicines: expiredMedicines)
+        }
+        .sheet(isPresented: $appState.isPresentingPaywall) {
+            PaywallView()
+        }
+        .sheet(isPresented: $appState.isPresentingSettings) {
+            SettingsView()
         }
         .task {
             guard !hasEvaluatedOnLaunch else { return }
@@ -66,11 +77,19 @@ struct RootView: View {
             switch phase {
             case .active:
                 evaluateExpiredAlert(isColdLaunch: false)
+                if subscriptionStore.isPro {
+                    Task { await cloudSync.pullNow() }
+                }
             case .background:
                 let medicines = activeMedicines
                 Task { await NotificationService.shared.sync(medicines: medicines) }
             default:
                 break
+            }
+        }
+        .onChange(of: subscriptionStore.isPro) { _, isPro in
+            if !isPro, appState.selectedTab == .archive {
+                appState.selectedTab = .overview
             }
         }
     }
@@ -90,7 +109,12 @@ struct RootView: View {
 }
 
 #Preview {
-    RootView()
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return RootView()
         .environment(AppState())
-        .modelContainer(PreviewData.container)
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .environment(services.cloudSync)
+        .modelContainer(container)
 }

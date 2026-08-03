@@ -25,7 +25,8 @@ enum MedicineSort: String, CaseIterable, Identifiable {
 /// Pełna lista leków w apteczce, z wyszukiwaniem i podziałem na sekcje według stanu ważności.
 struct MedicineListView: View {
     @Environment(AppState.self) private var appState
-    @Environment(\.modelContext) private var modelContext
+    @Environment(MedicineRepository.self) private var repository
+    @Environment(SubscriptionStore.self) private var subscriptionStore
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var medicines: [Medicine]
@@ -33,6 +34,7 @@ struct MedicineListView: View {
     @State private var searchText = ""
     @State private var tokens: [MedicineSearchToken] = []
     @State private var sort: MedicineSort = .expiry
+    @State private var medicinePendingDeletion: Medicine?
     @FocusState private var isSearchFocused: Bool
 
     private let now = Date.now
@@ -60,6 +62,22 @@ struct MedicineListView: View {
                     guard appState.isSearchFocusRequested else { return }
                     isSearchFocused = true
                     appState.isSearchFocusRequested = false
+                }
+                .confirmationDialog(
+                    Text(L10n.Medicines.deleteConfirmTitle),
+                    isPresented: deletionDialogBinding,
+                    titleVisibility: .visible,
+                    presenting: medicinePendingDeletion
+                ) { medicine in
+                    Button(L10n.Common.delete, role: .destructive) {
+                        MedicineActions.delete(medicine, in: repository)
+                        medicinePendingDeletion = nil
+                    }
+                    Button(L10n.Common.cancel, role: .cancel) {
+                        medicinePendingDeletion = nil
+                    }
+                } message: { _ in
+                    Text(L10n.Medicines.deleteConfirmMessage)
                 }
         }
     }
@@ -113,19 +131,30 @@ struct MedicineListView: View {
                             MedicineRow(medicine: medicine, now: now)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                MedicineActions.archive(
-                                    medicine,
-                                    reason: medicine.defaultArchiveReason(now: now),
-                                    in: modelContext)
-                            } label: {
-                                Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                            if subscriptionStore.isPro {
+                                Button(role: .destructive) {
+                                    let result = MedicineActions.archive(
+                                        medicine,
+                                        reason: medicine.defaultArchiveReason(now: now),
+                                        in: repository)
+                                    if case .failure(.requiresPro) = result {
+                                        appState.presentPaywall()
+                                    }
+                                } label: {
+                                    Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                                }
+                            } else {
+                                Button(role: .destructive) {
+                                    medicinePendingDeletion = medicine
+                                } label: {
+                                    Label(L10n.Common.delete, systemImage: "trash.fill")
+                                }
                             }
                         }
                         .swipeActions(edge: .leading) {
                             Button {
                                 MedicineActions.setOpened(
-                                    !medicine.isOpened, for: medicine, in: modelContext)
+                                    !medicine.isOpened, for: medicine, in: repository)
                             } label: {
                                 Label(
                                     medicine.isOpened
@@ -151,6 +180,14 @@ struct MedicineListView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        ToolbarItem {
+            Button {
+                appState.isPresentingSettings = true
+            } label: {
+                Label(L10n.Settings.title, systemImage: "gearshape")
+            }
+        }
+
         ToolbarItem {
             Menu {
                 Picker(selection: $sort) {
@@ -224,10 +261,20 @@ struct MedicineListView: View {
             return StatusSection(status: status, medicines: items)
         }
     }
+
+    private var deletionDialogBinding: Binding<Bool> {
+        Binding(
+            get: { medicinePendingDeletion != nil },
+            set: { if !$0 { medicinePendingDeletion = nil } })
+    }
 }
 
 #Preview {
-    MedicineListView()
+    let container = PreviewData.container
+    let services = AppServices(modelContainer: container)
+    return MedicineListView()
         .environment(AppState())
-        .modelContainer(PreviewData.container)
+        .environment(services.subscriptionStore)
+        .environment(services.repository)
+        .modelContainer(container)
 }

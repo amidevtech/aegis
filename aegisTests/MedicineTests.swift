@@ -10,12 +10,15 @@ import Testing
 @testable import aegis
 
 @MainActor
+@Suite(.serialized)
 struct MedicineTests {
 
-    private func makeContext() throws -> ModelContext {
+    private func makeServices(isPro: Bool = true) throws -> AppServices {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Medicine.self, configurations: configuration)
-        return ModelContext(container)
+        let services = AppServices(modelContainer: container)
+        services.subscriptionStore.debugProOverride = isPro
+        return services
     }
 
     private func daysFromNow(_ days: Int) -> Date {
@@ -60,16 +63,18 @@ struct MedicineTests {
 
     @Test("Archiwizacja zdejmuje lek z apteczki, ale zostawia go w bazie")
     func archivingKeepsMedicineInStore() throws {
-        let context = try makeContext()
+        let services = try makeServices()
         let medicine = Medicine(name: "Apap", expiryDate: daysFromNow(-5))
-        context.insert(medicine)
-        try context.save()
+        services.repository.upsert(medicine, isNew: true)
 
-        MedicineActions.archive(medicine, reason: .expired, in: context)
+        let result = MedicineActions.archive(medicine, reason: .expired, in: services.repository)
+        guard case .success = result else {
+            Issue.record("Oczekiwano sukcesu archiwizacji")
+            return
+        }
 
-        let active = try context.fetch(
-            FetchDescriptor<Medicine>(predicate: MedicineQueries.active))
-        let archived = try context.fetch(
+        let active = try services.localStore.fetchActive()
+        let archived = try services.localStore.context.fetch(
             FetchDescriptor<Medicine>(predicate: MedicineQueries.archived))
 
         #expect(active.isEmpty)
@@ -78,33 +83,62 @@ struct MedicineTests {
         #expect(archived.first?.name == "Apap")
     }
 
+    @Test("Archiwizacja bez Pro jest zablokowana")
+    func archivingRequiresPro() throws {
+        let services = try makeServices(isPro: false)
+        let medicine = Medicine(name: "Apap", expiryDate: daysFromNow(-5))
+        services.localStore.insert(medicine)
+
+        let result = MedicineActions.archive(medicine, reason: .expired, in: services.repository)
+        guard case .failure(.requiresPro) = result else {
+            Issue.record("Oczekiwano blokady requiresPro")
+            return
+        }
+        #expect(!medicine.isArchived)
+    }
+
     @Test("Przywrócenie z archiwum kasuje powód i datę archiwizacji")
     func restoringClearsArchiveMetadata() throws {
-        let context = try makeContext()
+        let services = try makeServices()
         let medicine = Medicine(name: "Ibuprom", expiryDate: daysFromNow(100))
-        context.insert(medicine)
-        MedicineActions.archive(medicine, reason: .usedUp, in: context)
+        services.repository.upsert(medicine, isNew: true)
+        _ = MedicineActions.archive(medicine, reason: .usedUp, in: services.repository)
 
-        MedicineActions.restore(medicine, in: context)
+        let result = MedicineActions.restore(medicine, in: services.repository)
+        guard case .success = result else {
+            Issue.record("Oczekiwano sukcesu przywrócenia")
+            return
+        }
 
         #expect(!medicine.isArchived)
         #expect(medicine.archiveReason == nil)
 
-        let active = try context.fetch(
-            FetchDescriptor<Medicine>(predicate: MedicineQueries.active))
+        let active = try services.localStore.fetchActive()
         #expect(active.count == 1)
     }
 
     @Test("Trwałe usunięcie znika z bazy")
     func permanentDeletionRemovesRecord() throws {
-        let context = try makeContext()
+        let services = try makeServices()
         let medicine = Medicine(name: "Gripex", expiryDate: daysFromNow(-300))
-        context.insert(medicine)
-        MedicineActions.archive(medicine, reason: .expired, in: context)
+        services.repository.upsert(medicine, isNew: true)
+        _ = MedicineActions.archive(medicine, reason: .expired, in: services.repository)
 
-        MedicineActions.deletePermanently(medicine, in: context)
+        MedicineActions.delete(medicine, in: services.repository)
 
-        let all = try context.fetch(FetchDescriptor<Medicine>())
+        let all = try services.localStore.fetchAll()
+        #expect(all.isEmpty)
+    }
+
+    @Test("Free może trwale usunąć aktywny lek")
+    func freeCanDeleteActiveMedicine() throws {
+        let services = try makeServices(isPro: false)
+        let medicine = Medicine(name: "Gripex", expiryDate: daysFromNow(30))
+        services.localStore.insert(medicine)
+
+        MedicineActions.delete(medicine, in: services.repository)
+
+        let all = try services.localStore.fetchAll()
         #expect(all.isEmpty)
     }
 

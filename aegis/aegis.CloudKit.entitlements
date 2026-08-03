@@ -2,10 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Przywracanie CloudKit:
-	     1. W aegisApp.swift ustaw StorageOptions.isCloudKitEnabled = true
-	     2. Skopiuj poniższe klucze do aegis.entitlements (obok network.client)
-	     3. W Xcode wybierz zespół deweloperski i kontener iCloud.com.amidev.aegis -->
+	<!-- Referencyjna kopia entitlementów iCloud.
+	     Aktywny plik to aegis.entitlements — CloudKit jest tam włączony,
+	     a sync uruchamia się dopiero przy entitlement Pro (StoreKit). -->
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.com.amidev.aegis</string>

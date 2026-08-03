@@ -1,0 +1,110 @@
+{
+  "identifier" : "AEGISPRO",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "pl_PL",
+    "_storefront" : "POL",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "AEGISPROGROUP",
+      "localizations" : [
+        {
+          "description" : "Sync iCloud, archiwum i wspólna apteczka rodzinna",
+          "displayName" : "Aegis Pro",
+          "locale" : "pl_PL"
+        },
+        {
+          "description" : "iCloud sync, archive, and family medicine cabinet sharing",
+          "displayName" : "Aegis Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Aegis Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "MONTHLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Pełny dostęp Pro rozliczany co miesiąc",
+              "displayName" : "Pro miesięcznie",
+              "locale" : "pl_PL"
+            },
+            {
+              "description" : "Full Pro access billed monthly",
+              "displayName" : "Pro Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.amidev.aegis.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "AEGISPROGROUP",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "59.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "YEARLY0001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Pełny dostęp Pro rozliczany co rok",
+              "displayName" : "Pro rocznie",
+              "locale" : "pl_PL"
+            },
+            {
+              "description" : "Full Pro access billed yearly",
+              "displayName" : "Pro Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.amidev.aegis.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "AEGISPROGROUP",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

@@ -41,6 +41,9 @@ final class Medicine {
     var archivedAt: Date?
     var archiveReasonRaw: String?
 
+    /// Znacznik do last-write-wins przy mirrorze CloudKit.
+    var modifiedAt: Date = Date.now
+
     init(
         name: String = "",
         activeSubstance: String = "",
@@ -55,7 +58,8 @@ final class Medicine {
         openedAt: Date? = nil,
         daysAfterOpening: Int? = nil,
         openedExpiryOverride: Date? = nil,
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        modifiedAt: Date = .now
     ) {
         self.name = name
         self.activeSubstance = activeSubstance
@@ -71,12 +75,17 @@ final class Medicine {
         self.daysAfterOpening = daysAfterOpening
         self.openedExpiryOverride = openedExpiryOverride
         self.createdAt = createdAt
+        self.modifiedAt = modifiedAt
         self.effectiveExpiryDate = ExpiryCalculator.effectiveExpiry(
             packageExpiry: expiryDate,
             isOpened: isOpened,
             openedAt: openedAt,
             daysAfterOpening: daysAfterOpening,
             openedExpiryOverride: openedExpiryOverride)
+    }
+
+    func touchModified(at date: Date = .now) {
+        modifiedAt = date
     }
 }
 

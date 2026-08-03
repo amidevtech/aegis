@@ -61,6 +61,8 @@ final class AppState {
     var selectedTab: AppTab = .overview
     var medicinesFilter: MedicineListFilter = .all
     var isPresentingNewMedicine = false
+    var isPresentingPaywall = false
+    var isPresentingSettings = false
 
     /// Prośba o przeniesienie kursora do pola wyszukiwania (skrót Command-F).
     /// Flaga, a nie zdarzenie, bo lista leków może dopiero powstawać po przełączeniu
@@ -75,5 +77,9 @@ final class AppState {
     func focusSearch() {
         selectedTab = .medicines
         isSearchFocusRequested = true
+    }
+
+    func presentPaywall() {
+        isPresentingPaywall = true
     }
 }

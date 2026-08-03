@@ -161,6 +161,13 @@ nonisolated enum L10n {
         static let sortByPerson = LocalizedStringResource(
             "medicines.sort.person", defaultValue: "Osoba",
             comment: "Sortowanie listy według osoby")
+        static let deleteConfirmTitle = LocalizedStringResource(
+            "medicines.delete.confirm.title", defaultValue: "Usunąć lek?",
+            comment: "Tytuł potwierdzenia trwałego usunięcia z aktywnej listy (Free)")
+        static let deleteConfirmMessage = LocalizedStringResource(
+            "medicines.delete.confirm.message",
+            defaultValue: "Lek zostanie trwale usunięty. W wersji Pro możesz zamiast tego przenieść go do archiwum.",
+            comment: "Treść potwierdzenia usunięcia bez archiwum")
     }
 
     enum Search {
@@ -373,6 +380,9 @@ nonisolated enum L10n {
         static let archiveAll = LocalizedStringResource(
             "expired.archive_all", defaultValue: "Przenieś wszystkie do archiwum",
             comment: "Akcja archiwizująca wszystkie przeterminowane leki")
+        static let deleteAll = LocalizedStringResource(
+            "expired.delete_all", defaultValue: "Usuń wszystkie",
+            comment: "Akcja trwale usuwająca przeterminowane leki w wersji Free")
         static let archiveOne = LocalizedStringResource(
             "expired.archive_one", defaultValue: "Do archiwum",
             comment: "Akcja archiwizująca pojedynczy lek")
@@ -404,6 +414,102 @@ nonisolated enum L10n {
         static let search = LocalizedStringResource(
             "menu.search", defaultValue: "Szukaj",
             comment: "Pozycja menu na Macu ustawiająca kursor w wyszukiwarce")
+    }
+
+    enum Paywall {
+        static let title = LocalizedStringResource(
+            "paywall.title", defaultValue: "Aegis Pro",
+            comment: "Tytuł arkusza subskrypcji")
+        static let headline = LocalizedStringResource(
+            "paywall.headline", defaultValue: "Apteczka dla całej rodziny",
+            comment: "Nagłówek paywalla")
+        static let subtitle = LocalizedStringResource(
+            "paywall.subtitle",
+            defaultValue: "Synchronizacja iCloud, archiwum i wspólna apteczka przez Family Sharing.",
+            comment: "Podtytuł paywalla")
+        static let benefitSync = LocalizedStringResource(
+            "paywall.benefit.sync", defaultValue: "Sync na iPhonie, iPadzie i Macu",
+            comment: "Korzyść Pro: synchronizacja")
+        static let benefitFamily = LocalizedStringResource(
+            "paywall.benefit.family", defaultValue: "Wspólna apteczka w rodzinie",
+            comment: "Korzyść Pro: udostępnianie")
+        static let benefitArchive = LocalizedStringResource(
+            "paywall.benefit.archive", defaultValue: "Archiwum i przywracanie leków",
+            comment: "Korzyść Pro: archiwum")
+        static let restore = LocalizedStringResource(
+            "paywall.restore", defaultValue: "Przywróć zakupy",
+            comment: "Przycisk przywracania zakupów StoreKit")
+        static let debugUnlock = LocalizedStringResource(
+            "paywall.debug_unlock", defaultValue: "Odblokuj Pro (debug)",
+            comment: "Tymczasowe odblokowanie Pro w buildach debug")
+    }
+
+    enum Settings {
+        static let title = LocalizedStringResource(
+            "settings.title", defaultValue: "Ustawienia",
+            comment: "Tytuł ekranu ustawień")
+        static let subscriptionSection = LocalizedStringResource(
+            "settings.subscription", defaultValue: "Subskrypcja",
+            comment: "Sekcja statusu Pro")
+        static let status = LocalizedStringResource(
+            "settings.status", defaultValue: "Status",
+            comment: "Etykieta statusu subskrypcji")
+        static let statusFree = LocalizedStringResource(
+            "settings.status.free", defaultValue: "Free",
+            comment: "Status bez subskrypcji")
+        static let statusPro = LocalizedStringResource(
+            "settings.status.pro", defaultValue: "Pro",
+            comment: "Status z aktywnym Pro")
+        static let upgrade = LocalizedStringResource(
+            "settings.upgrade", defaultValue: "Przejdź na Pro",
+            comment: "Przycisk otwierający paywall")
+        static let manageSubscription = LocalizedStringResource(
+            "settings.manage", defaultValue: "Zarządzaj subskrypcją",
+            comment: "Link do zarządzania subskrypcją w App Store")
+        static let syncSection = LocalizedStringResource(
+            "settings.sync", defaultValue: "Synchronizacja",
+            comment: "Sekcja statusu iCloud")
+        static let iCloudStatus = LocalizedStringResource(
+            "settings.icloud.status", defaultValue: "Konto iCloud",
+            comment: "Etykieta statusu konta iCloud")
+        static let iCloudAvailable = LocalizedStringResource(
+            "settings.icloud.available", defaultValue: "Dostępne",
+            comment: "iCloud dostępne")
+        static let iCloudNoAccount = LocalizedStringResource(
+            "settings.icloud.no_account", defaultValue: "Brak konta",
+            comment: "Brak zalogowanego iCloud")
+        static let iCloudRestricted = LocalizedStringResource(
+            "settings.icloud.restricted", defaultValue: "Ograniczone",
+            comment: "iCloud ograniczone")
+        static let iCloudUnknown = LocalizedStringResource(
+            "settings.icloud.unknown", defaultValue: "Nieznany",
+            comment: "Nieznany status iCloud")
+        static let iCloudUnavailable = LocalizedStringResource(
+            "settings.icloud.unavailable",
+            defaultValue: "iCloud jest niedostępne na tym urządzeniu.",
+            comment: "Komunikat gdy sync nie może wystartować")
+        static let syncActive = LocalizedStringResource(
+            "settings.sync.active", defaultValue: "Sync aktywny",
+            comment: "CloudSync działa")
+        static let syncInactive = LocalizedStringResource(
+            "settings.sync.inactive", defaultValue: "Sync nieaktywny",
+            comment: "CloudSync wyłączony")
+        static let syncNow = LocalizedStringResource(
+            "settings.sync.now", defaultValue: "Synchronizuj teraz",
+            comment: "Ręczne odświeżenie CloudKit")
+        static let sharingSection = LocalizedStringResource(
+            "settings.sharing", defaultValue: "Rodzina",
+            comment: "Sekcja CKShare")
+        static let shareCabinet = LocalizedStringResource(
+            "settings.share", defaultValue: "Udostępnij apteczkę",
+            comment: "Przycisk otwierający CKShare")
+        static let shareTitle = LocalizedStringResource(
+            "settings.share.title", defaultValue: "Domowa apteczka",
+            comment: "Tytuł CKShare")
+        static let shareFootnote = LocalizedStringResource(
+            "settings.share.footnote",
+            defaultValue: "Zaproszeni członkowie rodziny zobaczą te same leki na swoich urządzeniach.",
+            comment: "Wyjaśnienie udostępniania apteczki")
     }
 
     /// Klucze powiadomień są rozwiązywane dopiero w chwili dostarczenia

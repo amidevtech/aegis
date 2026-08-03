@@ -25,6 +25,7 @@ struct LocalizationTests {
         "medicines.add",
         "medicines.search_prompt",
         "medicines.section.expired",
+        "medicines.delete.confirm.title",
         "form.title.new",
         "form.opened",
         "detail.substance",
@@ -34,6 +35,10 @@ struct LocalizationTests {
         "archive_reason.used_up",
         "expired.title",
         "expired.footnote",
+        "expired.delete_all",
+        "paywall.title",
+        "settings.title",
+        "settings.share",
         "medicine_form.eye_drops",
         "status.expired",
         "menu.new_medicine"
