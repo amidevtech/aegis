@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Identyfikatory produktów subskrypcji w App Store Connect / Configuration.storekit.
+/// Subscription product identifiers in App Store Connect / Configuration.storekit.
 enum SubscriptionProductID: String, CaseIterable, Identifiable, Sendable {
     case monthly = "com.amidev.aegis.pro.monthly"
     case yearly = "com.amidev.aegis.pro.yearly"

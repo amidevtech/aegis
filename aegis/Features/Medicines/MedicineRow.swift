@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Wiersz listy leków - odpowiednik `.medicine-row` z szablonu webowego.
+/// Medicine list row — counterpart of `.medicine-row` in the web template.
 struct MedicineRow: View {
     let medicine: Medicine
     var now: Date = .now
@@ -63,7 +63,7 @@ struct MedicineRow: View {
     }
 }
 
-#Preview("Wiersze") {
+#Preview("Rows") {
     List(PreviewData.samples.prefix(5), id: \.uuid) { medicine in
         MedicineRow(medicine: medicine)
     }

@@ -6,7 +6,7 @@
 import Foundation
 import SwiftData
 
-/// Kontener zależności tworzony raz przy starcie aplikacji.
+/// Dependency container created once at app launch.
 @MainActor
 final class AppServices {
     let subscriptionStore: SubscriptionStore

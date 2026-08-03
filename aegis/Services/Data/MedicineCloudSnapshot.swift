@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Bezstanowy snapshot leku do mirrorowania LocalStore ↔ CloudKit (bez zależności od SwiftData w koderze).
+/// Stateless medicine snapshot for LocalStore ↔ CloudKit mirroring (no SwiftData dependency in the coder).
 struct MedicineCloudSnapshot: Equatable, Sendable {
     var uuid: UUID
     var name: String

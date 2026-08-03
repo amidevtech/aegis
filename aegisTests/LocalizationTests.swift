@@ -8,13 +8,13 @@ import Testing
 
 @testable import aegis
 
-/// Pilnuje, żeby żaden klucz nie został bez tłumaczenia. Bez tego brakujący wpis
-/// objawia się dopiero surowym kluczem na ekranie albo w powiadomieniu.
+/// Ensures every key has a translation. Without this, a missing entry
+/// only shows up as a raw key on screen or in a notification.
 struct LocalizationTests {
 
     private static let supportedLanguages = ["pl", "en"]
 
-    /// Reprezentatywne klucze z każdego obszaru aplikacji.
+    /// Representative keys from each area of the app.
     private static let sampledKeys = [
         "app.title",
         "tab.overview",
@@ -44,8 +44,8 @@ struct LocalizationTests {
         "menu.new_medicine"
     ]
 
-    /// Powiadomienia nie mają wartości domyślnej w kodzie - system rozwiązuje je
-    /// dopiero przy dostarczeniu, więc brak wpisu byłby widoczny dla użytkownika.
+    /// Notifications have no default value in code — the system resolves them
+    /// at delivery time, so a missing entry would be visible to the user.
     private static let notificationKeys = [
         L10n.NotificationKey.expiringTitle,
         L10n.NotificationKey.expiredTitle,
@@ -57,39 +57,39 @@ struct LocalizationTests {
     private func bundle(for language: String) throws -> Bundle {
         let path = try #require(
             Bundle.main.path(forResource: language, ofType: "lproj"),
-            "Brak katalogu \(language).lproj w pakiecie aplikacji")
+            "Missing \(language).lproj directory in the app bundle")
         return try #require(Bundle(path: path))
     }
 
-    @Test("Każdy język ma własny katalog tłumaczeń", arguments: supportedLanguages)
+    @Test("Each language has its own localization catalog", arguments: supportedLanguages)
     func languageBundleExists(language: String) throws {
         _ = try bundle(for: language)
     }
 
-    @Test("Klucze interfejsu są przetłumaczone we wszystkich językach",
+    @Test("Interface keys are translated in every language",
           arguments: supportedLanguages)
     func interfaceKeysAreTranslated(language: String) throws {
         let bundle = try bundle(for: language)
 
         for key in Self.sampledKeys {
             let value = bundle.localizedString(forKey: key, value: nil, table: "Localizable")
-            #expect(value != key, "Brak tłumaczenia \(language) dla klucza \(key)")
+            #expect(value != key, "Missing \(language) translation for key \(key)")
             #expect(!value.isEmpty)
         }
     }
 
-    @Test("Teksty powiadomień są przetłumaczone we wszystkich językach",
+    @Test("Notification copy is translated in every language",
           arguments: supportedLanguages)
     func notificationKeysAreTranslated(language: String) throws {
         let bundle = try bundle(for: language)
 
         for key in Self.notificationKeys {
             let value = bundle.localizedString(forKey: key, value: nil, table: "Localizable")
-            #expect(value != key, "Brak tłumaczenia \(language) dla powiadomienia \(key)")
+            #expect(value != key, "Missing \(language) translation for notification \(key)")
         }
     }
 
-    @Test("Polski i angielski faktycznie się różnią")
+    @Test("Polish and English translations actually differ")
     func translationsDiffer() throws {
         let polish = try bundle(for: "pl")
         let english = try bundle(for: "en")
@@ -97,11 +97,11 @@ struct LocalizationTests {
         for key in ["tab.overview", "medicines.add", "status.expired"] {
             let plValue = polish.localizedString(forKey: key, value: nil, table: "Localizable")
             let enValue = english.localizedString(forKey: key, value: nil, table: "Localizable")
-            #expect(plValue != enValue, "Klucz \(key) ma identyczny tekst w obu językach")
+            #expect(plValue != enValue, "Key \(key) has identical text in both languages")
         }
     }
 
-    @Test("Nazwa aplikacji jest zlokalizowana", arguments: supportedLanguages)
+    @Test("App display name is localized", arguments: supportedLanguages)
     func displayNameIsLocalized(language: String) throws {
         let bundle = try bundle(for: language)
         let value = bundle.localizedString(
@@ -111,7 +111,7 @@ struct LocalizationTests {
         #expect(!value.isEmpty)
     }
 
-    @Test("Polskie liczniki mają wszystkie formy liczby mnogiej")
+    @Test("Polish plurals cover every plural form")
     func polishPluralsCoverEveryForm() throws {
         let polish = try bundle(for: "pl")
         let variants = [1, 2, 5, 22, 25].map { count in
@@ -121,10 +121,10 @@ struct LocalizationTests {
                 count)
         }
 
-        #expect(variants[0].contains("dzień"), "1 dzień")
-        #expect(variants[1].contains("dni"), "2 dni")
-        #expect(variants[2].contains("dni"), "5 dni")
-        #expect(variants[3].contains("dni"), "22 dni")
-        #expect(variants[4].contains("dni"), "25 dni")
+        #expect(variants[0].contains("dzień"), "expected singular for 1")
+        #expect(variants[1].contains("dni"), "expected plural for 2")
+        #expect(variants[2].contains("dni"), "expected plural for 5")
+        #expect(variants[3].contains("dni"), "expected plural for 22")
+        #expect(variants[4].contains("dni"), "expected plural for 25")
     }
 }

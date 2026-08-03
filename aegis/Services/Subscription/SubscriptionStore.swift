@@ -7,7 +7,7 @@ import Foundation
 import Observation
 import StoreKit
 
-/// Stan subskrypcji Pro. Gate dla CloudSync, archiwum i udostępniania rodziny.
+/// Pro subscription state. Gate for CloudSync, archive, and family sharing.
 @MainActor
 @Observable
 final class SubscriptionStore {
@@ -16,8 +16,8 @@ final class SubscriptionStore {
     private(set) var isLoading = false
     private(set) var lastErrorMessage: String?
 
-    /// Lokalny override do testów (Configuration.storekit / UI bez ASC).
-    /// Nie jest persystowany — żeby testy i debug nie zostawiały stanu między uruchomieniami procesu.
+    /// Local override for tests (Configuration.storekit / UI without ASC).
+    /// Not persisted — so tests and debug do not leave state across process launches.
     var debugProOverride: Bool?
 
     var isPro: Bool {

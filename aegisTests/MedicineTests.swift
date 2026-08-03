@@ -25,7 +25,7 @@ struct MedicineTests {
         Calendar.current.date(byAdding: .day, value: days, to: .now) ?? .now
     }
 
-    @Test("Otwarcie opakowania podpowiada typową przydatność dla danej postaci")
+    @Test("Opening a package applies the typical shelf life for that form")
     func markingOpenedAppliesSuggestedShelfLife() {
         let medicine = Medicine(expiryDate: daysFromNow(400), form: .eyeDrops)
         medicine.markOpened()
@@ -35,7 +35,7 @@ struct MedicineTests {
         #expect(medicine.status() == .expiringSoon)
     }
 
-    @Test("Cofnięcie otwarcia przywraca termin z opakowania")
+    @Test("Marking unopened restores the package expiry")
     func markingUnopenedRestoresPackageExpiry() {
         let packageExpiry = daysFromNow(400)
         let medicine = Medicine(expiryDate: packageExpiry, form: .syrup)
@@ -49,7 +49,7 @@ struct MedicineTests {
         #expect(medicine.status() == .valid)
     }
 
-    @Test("Zapisany termin obowiązujący nadąża za zmianą dat")
+    @Test("Stored effective expiry stays in sync when dates change")
     func effectiveExpiryIsKeptInSync() {
         let medicine = Medicine(expiryDate: daysFromNow(400), form: .tablet)
         let startOfDay = Calendar.current.startOfDay(for: daysFromNow(400))
@@ -61,7 +61,7 @@ struct MedicineTests {
         #expect(medicine.effectiveExpiryDate == Calendar.current.startOfDay(for: daysFromNow(10)))
     }
 
-    @Test("Archiwizacja zdejmuje lek z apteczki, ale zostawia go w bazie")
+    @Test("Archiving removes the medicine from the cabinet but keeps it in the store")
     func archivingKeepsMedicineInStore() throws {
         let services = try makeServices()
         let medicine = Medicine(name: "Apap", expiryDate: daysFromNow(-5))
@@ -69,7 +69,7 @@ struct MedicineTests {
 
         let result = MedicineActions.archive(medicine, reason: .expired, in: services.repository)
         guard case .success = result else {
-            Issue.record("Oczekiwano sukcesu archiwizacji")
+            Issue.record("Expected archive to succeed")
             return
         }
 
@@ -83,7 +83,7 @@ struct MedicineTests {
         #expect(archived.first?.name == "Apap")
     }
 
-    @Test("Archiwizacja bez Pro jest zablokowana")
+    @Test("Archiving without Pro is blocked")
     func archivingRequiresPro() throws {
         let services = try makeServices(isPro: false)
         let medicine = Medicine(name: "Apap", expiryDate: daysFromNow(-5))
@@ -91,13 +91,13 @@ struct MedicineTests {
 
         let result = MedicineActions.archive(medicine, reason: .expired, in: services.repository)
         guard case .failure(.requiresPro) = result else {
-            Issue.record("Oczekiwano blokady requiresPro")
+            Issue.record("Expected requiresPro failure")
             return
         }
         #expect(!medicine.isArchived)
     }
 
-    @Test("Przywrócenie z archiwum kasuje powód i datę archiwizacji")
+    @Test("Restoring from archive clears reason and archive date")
     func restoringClearsArchiveMetadata() throws {
         let services = try makeServices()
         let medicine = Medicine(name: "Ibuprom", expiryDate: daysFromNow(100))
@@ -106,7 +106,7 @@ struct MedicineTests {
 
         let result = MedicineActions.restore(medicine, in: services.repository)
         guard case .success = result else {
-            Issue.record("Oczekiwano sukcesu przywrócenia")
+            Issue.record("Expected restore to succeed")
             return
         }
 
@@ -117,7 +117,7 @@ struct MedicineTests {
         #expect(active.count == 1)
     }
 
-    @Test("Trwałe usunięcie znika z bazy")
+    @Test("Permanent deletion removes the record from the store")
     func permanentDeletionRemovesRecord() throws {
         let services = try makeServices()
         let medicine = Medicine(name: "Gripex", expiryDate: daysFromNow(-300))
@@ -130,7 +130,7 @@ struct MedicineTests {
         #expect(all.isEmpty)
     }
 
-    @Test("Free może trwale usunąć aktywny lek")
+    @Test("Free can permanently delete an active medicine")
     func freeCanDeleteActiveMedicine() throws {
         let services = try makeServices(isPro: false)
         let medicine = Medicine(name: "Gripex", expiryDate: daysFromNow(30))
@@ -142,7 +142,7 @@ struct MedicineTests {
         #expect(all.isEmpty)
     }
 
-    @Test("Domyślny powód archiwizacji zależy od stanu ważności")
+    @Test("Default archive reason follows expiry status")
     func defaultArchiveReasonFollowsStatus() {
         let expired = Medicine(expiryDate: daysFromNow(-1))
         let valid = Medicine(expiryDate: daysFromNow(90))
@@ -151,18 +151,18 @@ struct MedicineTests {
         #expect(valid.defaultArchiveReason() == .removed)
     }
 
-    @Test("Formularz zachowuje wszystkie pola przy edycji")
+    @Test("Draft preserves every field on edit round-trip")
     func draftPreservesFieldsOnRoundTrip() {
         let original = Medicine(
             name: "Amoksiklav",
-            activeSubstance: "Amoksycylina",
+            activeSubstance: "Amoxicillin",
             expiryDate: daysFromNow(200),
-            personName: "Zosia",
-            indication: "Angina",
+            personName: "Sophie",
+            indication: "Strep throat",
             dosage: "5 ml",
             quantity: "100 ml",
             form: .syrup,
-            notes: "W lodówce",
+            notes: "Keep refrigerated",
             isOpened: true,
             openedAt: daysFromNow(-3),
             daysAfterOpening: 14)
@@ -183,22 +183,22 @@ struct MedicineTests {
         #expect(copy.effectiveExpiryDate == original.effectiveExpiryDate)
     }
 
-    @Test("Wyszukiwanie obejmuje nazwę, substancję, osobę i zastosowanie")
+    @Test("Free-text search covers name, substance, person, and indication")
     func freeTextSearchCoversAllDescriptiveFields() {
         let medicine = Medicine(
             name: "Apap",
             activeSubstance: "Paracetamol",
-            personName: "Ania",
-            indication: "Ból głowy")
+            personName: "Anna",
+            indication: "Headache")
 
         #expect(medicine.matches(freeText: "apa"))
         #expect(medicine.matches(freeText: "paracet"))
-        #expect(medicine.matches(freeText: "ania"))
-        #expect(medicine.matches(freeText: "ból"))
+        #expect(medicine.matches(freeText: "anna"))
+        #expect(medicine.matches(freeText: "head"))
         #expect(!medicine.matches(freeText: "ibuprofen"))
     }
 
-    @Test("Wyszukiwanie ignoruje polskie znaki diakrytyczne i wielkość liter")
+    @Test("Free-text search ignores Polish diacritics and letter case")
     func freeTextSearchIsDiacriticInsensitive() {
         let medicine = Medicine(name: "Zatoki", indication: "Ból gardła")
 
@@ -206,29 +206,29 @@ struct MedicineTests {
         #expect(medicine.matches(freeText: "bol"))
     }
 
-    @Test("Token zawęża wyniki do wybranego pola")
+    @Test("Token narrows results to the chosen field")
     func tokenNarrowsToSingleField() {
         let medicine = Medicine(
-            name: "Ania",
+            name: "Anna",
             activeSubstance: "Ibuprofen",
-            personName: "Marek",
-            indication: "Gorączka")
+            personName: "Mark",
+            indication: "Fever")
 
-        let personToken = MedicineSearchToken(field: .person, value: "Ania")
+        let personToken = MedicineSearchToken(field: .person, value: "Anna")
         #expect(!personToken.matches(medicine))
 
         let substanceToken = MedicineSearchToken(field: .substance, value: "Ibuprofen")
         #expect(substanceToken.matches(medicine))
     }
 
-    @Test("Podpowiedzi tokenów nie powtarzają tych samych wartości")
+    @Test("Token suggestions do not repeat the same values")
     func tokenSuggestionsAreDeduplicated() {
         let medicines = [
-            Medicine(personName: "Ania", indication: "Ból głowy"),
-            Medicine(personName: "Ania", indication: "Ból gardła")
+            Medicine(personName: "Anna", indication: "Headache"),
+            Medicine(personName: "Anna", indication: "Sore throat")
         ]
 
-        let suggestions = medicines.searchTokenSuggestions(matching: "ani")
+        let suggestions = medicines.searchTokenSuggestions(matching: "ann")
 
         #expect(suggestions.count == 1)
         #expect(suggestions.first?.field == .person)

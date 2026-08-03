@@ -6,13 +6,13 @@
 import Foundation
 import SwiftData
 
-/// Kontener w pamięci z przykładową apteczką - używany wyłącznie przez podglądy.
+/// In-memory container with a sample cabinet — used only by previews.
 enum PreviewData {
 
     static let container: ModelContainer = {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         guard let container = try? ModelContainer(for: Medicine.self, configurations: configuration)
-        else { fatalError("Nie udało się utworzyć kontenera podglądu") }
+        else { fatalError("Failed to create preview container") }
 
         for medicine in samples {
             container.mainContext.insert(medicine)
@@ -20,11 +20,11 @@ enum PreviewData {
         return container
     }()
 
-    /// Pusta apteczka - do podglądów stanów pustych.
+    /// Empty cabinet — for empty-state previews.
     static let emptyContainer: ModelContainer = {
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         guard let container = try? ModelContainer(for: Medicine.self, configurations: configuration)
-        else { fatalError("Nie udało się utworzyć kontenera podglądu") }
+        else { fatalError("Failed to create preview container") }
         return container
     }()
 

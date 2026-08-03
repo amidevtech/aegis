@@ -85,9 +85,9 @@ struct aegisApp: App {
         #endif
     }
 
-    /// Free i Pro korzystają z lokalnego SwiftData. CloudKit jest własnym syncem
-    /// (`CloudSyncService`) włączanym dopiero przy entitlement Pro — nie używamy
-    /// wbudowanego `cloudKitDatabase: .automatic` (brak CKShare).
+    /// Free and Pro both use local SwiftData. CloudKit is a custom sync
+    /// (`CloudSyncService`) enabled only with a Pro entitlement — we do not use
+    /// built-in `cloudKitDatabase: .automatic` (no CKShare support).
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([Medicine.self])
         let candidates: [ModelConfiguration] = [
@@ -101,12 +101,12 @@ struct aegisApp: App {
             }
         }
 
-        fatalError("Nie udało się utworzyć magazynu danych w żadnej konfiguracji")
+        fatalError("Failed to create a data store in any configuration")
     }
 }
 
-/// Pokazuje powiadomienie także wtedy, gdy aplikacja jest akurat na wierzchu -
-/// bez tego przypomnienie o terminie zostałoby po cichu pominięte.
+/// Presents notifications even while the app is in the foreground —
+/// otherwise an expiry reminder would be silently skipped.
 final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = NotificationPresenter()
 

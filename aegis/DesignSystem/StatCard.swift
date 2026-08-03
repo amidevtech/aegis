@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Kafelek podsumowania z ekranu przeglądu - odpowiednik `.stats article` z szablonu.
+/// Summary tile from the overview screen — counterpart of `.stats article` in the template.
 struct StatCard: View {
     let title: LocalizedStringResource
     let caption: LocalizedStringResource
@@ -47,7 +47,7 @@ struct StatCard: View {
     }
 }
 
-#Preview("Kafelki") {
+#Preview("Tiles") {
     VStack(spacing: 12) {
         StatCard(
             title: L10n.Dashboard.statActiveTitle,

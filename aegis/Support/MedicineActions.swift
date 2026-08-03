@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// Cienka fasada nad `MedicineRepository`, żeby call site'y w widokach
-/// zostały czytelne (archive / restore / delete / setOpened).
+/// Thin facade over `MedicineRepository` so call sites in views
+/// stay readable (archive / restore / delete / setOpened).
 enum MedicineActions {
 
     @MainActor

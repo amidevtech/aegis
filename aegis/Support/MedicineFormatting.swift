@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// Teksty pochodne od stanu leku. Wszystkie daty formatowane są przez `Date.FormatStyle`,
-/// więc układ dnia i miesiąca dopasowuje się do regionu użytkownika.
+/// Derived copy from medicine state. All dates use `Date.FormatStyle`,
+/// so day/month layout follows the user's region.
 extension Medicine {
 
     var expiryDateText: String {
@@ -33,7 +33,7 @@ extension Medicine {
         archivedAt?.formatted(date: .abbreviated, time: .omitted)
     }
 
-    /// Krótki opis terminu: "Wygasa za 12 dni", "Wygasa dziś", "Po terminie od 3 dni".
+    /// Short expiry blurb: "Expires in 12 days", "Expires today", "Expired 3 days ago".
     func expiryDescription(now: Date = .now) -> LocalizedStringResource {
         let days = daysRemaining(now: now)
         if days == 0 { return L10n.Status.expiresToday }
@@ -41,13 +41,13 @@ extension Medicine {
         return L10n.Status.expiresIn(days: days)
     }
 
-    /// Druga linia wiersza listy: substancja czynna, a gdy jej nie podano - zastosowanie.
+    /// Second line of a list row: active substance, or indication when substance is empty.
     var subtitleText: String? {
         let candidates = [activeSubstance, indication, quantity]
         return candidates.first { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
     }
 
-    /// Osoba i dolegliwość połączone w jedną linię, z pominięciem pustych wartości.
+    /// Person and indication joined into one line, skipping empty values.
     var metaText: String? {
         let parts = [personName, indication].filter {
             !$0.trimmingCharacters(in: .whitespaces).isEmpty

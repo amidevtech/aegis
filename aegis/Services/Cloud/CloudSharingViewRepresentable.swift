@@ -9,7 +9,7 @@ import SwiftUI
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-/// Most do systemowego UI udostępniania CKShare.
+/// Bridge to the system CKShare sharing UI.
 struct CloudSharingViewRepresentable: UIViewControllerRepresentable {
     let share: CKShare
     let container: CKContainer
@@ -32,7 +32,7 @@ struct CloudSharingViewRepresentable: UIViewControllerRepresentable {
             _ csc: UICloudSharingController,
             failedToSaveShareWithError error: Error
         ) {
-            // Błąd jest też widoczny w systemowym UI.
+            // The error is also visible in the system UI.
         }
 
         func itemThumbnailData(for csc: UICloudSharingController) -> Data? { nil }
@@ -50,9 +50,9 @@ struct CloudSharingViewRepresentable: NSViewControllerRepresentable {
     let container: CKContainer
 
     func makeNSViewController(context: Context) -> NSViewController {
-        // macOS 12+: UICloudSharingController nie istnieje; używamy sheet z informacją
-        // i linkiem — pełne NSSharingServicePicker wymaga dodatkowego mostu.
-        // Prezentujemy pusty host; SettingsView pokazuje instrukcję gdy share już istnieje.
+        // macOS 12+: UICloudSharingController does not exist; we use an info sheet
+        // with a link — full NSSharingServicePicker needs an extra bridge.
+        // Present an empty host; SettingsView shows instructions when a share already exists.
         NSViewController()
     }
 

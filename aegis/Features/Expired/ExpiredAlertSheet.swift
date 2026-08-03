@@ -6,7 +6,7 @@
 import SwiftData
 import SwiftUI
 
-/// Arkusz pokazywany przy starcie aplikacji, gdy w apteczce są leki po terminie.
+/// Sheet shown at app launch when the cabinet has expired medicines.
 struct ExpiredAlertSheet: View {
     let medicines: [Medicine]
 

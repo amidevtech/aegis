@@ -6,8 +6,8 @@
 import SwiftData
 import SwiftUI
 
-/// Formularz dodawania i edycji leku. Obowiązkowa jest tylko nazwa - resztę
-/// można uzupełnić później.
+/// Form for adding and editing a medicine. Only the name is required —
+/// everything else can be filled in later.
 struct MedicineFormView: View {
     enum Mode {
         case create
@@ -56,7 +56,7 @@ struct MedicineFormView: View {
         #endif
     }
 
-    // MARK: - Sekcje
+    // MARK: - Sections
 
     private var medicineSection: some View {
         Section(L10n.Form.sectionMedicine) {
@@ -143,7 +143,7 @@ struct MedicineFormView: View {
         }
     }
 
-    // MARK: - Podpowiedzi
+    // MARK: - Suggestions
 
     @ViewBuilder
     private func suggestions(
@@ -168,7 +168,7 @@ struct MedicineFormView: View {
         }
     }
 
-    // MARK: - Zapis
+    // MARK: - Save
 
     private func loadDraftIfNeeded() {
         guard !hasLoadedDraft else { return }
@@ -193,7 +193,7 @@ struct MedicineFormView: View {
     }
 }
 
-#Preview("Nowy lek") {
+#Preview("New medicine") {
     let container = PreviewData.container
     let services = AppServices(modelContainer: container)
     return MedicineFormView(mode: .create)
@@ -201,7 +201,7 @@ struct MedicineFormView: View {
         .modelContainer(container)
 }
 
-#Preview("Edycja") {
+#Preview("Edit") {
     let container = PreviewData.container
     let services = AppServices(modelContainer: container)
     return MedicineFormView(mode: .edit(PreviewData.samples[2]))

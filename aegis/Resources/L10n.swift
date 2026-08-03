@@ -5,515 +5,514 @@
 
 import Foundation
 
-/// Wszystkie teksty interfejsu w jednym miejscu.
+/// All interface copy in one place.
 ///
-/// Klucze są symboliczne i niezależne od brzmienia tekstu, dzięki czemu zmiana
-/// polskiego wariantu nie unieważnia pozostałych tłumaczeń. Wartości domyślne
-/// są po polsku - to język źródłowy projektu.
+/// Keys are symbolic and independent of wording, so changing one language
+/// variant does not invalidate the others.
 nonisolated enum L10n {
 
     enum App {
         static let title = LocalizedStringResource(
             "app.title", defaultValue: "Domowa Apteczka",
-            comment: "Nazwa aplikacji widoczna na ekranie przeglądu")
+            comment: "App name shown on the overview screen")
     }
 
     enum Common {
         static let cancel = LocalizedStringResource(
             "common.cancel", defaultValue: "Anuluj",
-            comment: "Przycisk zamykający arkusz bez zapisywania")
+            comment: "Button that dismisses a sheet without saving")
         static let save = LocalizedStringResource(
             "common.save", defaultValue: "Zapisz",
-            comment: "Przycisk zapisujący formularz")
+            comment: "Button that saves the form")
         static let done = LocalizedStringResource(
             "common.done", defaultValue: "Gotowe",
-            comment: "Przycisk zamykający arkusz informacyjny")
+            comment: "Button that dismisses an informational sheet")
         static let delete = LocalizedStringResource(
             "common.delete", defaultValue: "Usuń",
-            comment: "Akcja trwałego usunięcia")
+            comment: "Permanent delete action")
         static let edit = LocalizedStringResource(
             "common.edit", defaultValue: "Edytuj",
-            comment: "Akcja otwierająca formularz edycji")
+            comment: "Action that opens the edit form")
         static let notProvided = LocalizedStringResource(
             "common.not_provided", defaultValue: "Nie podano",
-            comment: "Zastępnik dla pustego pola w szczegółach leku")
+            comment: "Placeholder for an empty field in medicine details")
     }
 
     enum Tab {
         static let overview = LocalizedStringResource(
             "tab.overview", defaultValue: "Przegląd",
-            comment: "Zakładka z podsumowaniem apteczki")
+            comment: "Tab with the cabinet overview")
         static let medicines = LocalizedStringResource(
             "tab.medicines", defaultValue: "Leki",
-            comment: "Zakładka z listą wszystkich leków")
+            comment: "Tab with the full medicine list")
         static let archive = LocalizedStringResource(
             "tab.archive", defaultValue: "Archiwum",
-            comment: "Zakładka z historią leków")
+            comment: "Tab with medicine history")
     }
 
     enum Dashboard {
         static let greetingMorning = LocalizedStringResource(
             "dashboard.greeting.morning", defaultValue: "Dzień dobry",
-            comment: "Powitanie wyświetlane rano")
+            comment: "Greeting shown in the morning")
         static let greetingAfternoon = LocalizedStringResource(
             "dashboard.greeting.afternoon", defaultValue: "Dzień dobry",
-            comment: "Powitanie wyświetlane po południu")
+            comment: "Greeting shown in the afternoon")
         static let greetingEvening = LocalizedStringResource(
             "dashboard.greeting.evening", defaultValue: "Dobry wieczór",
-            comment: "Powitanie wyświetlane wieczorem")
+            comment: "Greeting shown in the evening")
         static let subtitle = LocalizedStringResource(
             "dashboard.subtitle", defaultValue: "Sprawdź stan swojej domowej apteczki",
-            comment: "Podtytuł pod powitaniem na ekranie przeglądu")
+            comment: "Subtitle under the greeting on the overview screen")
 
         static let statActiveTitle = LocalizedStringResource(
             "dashboard.stat.active.title", defaultValue: "Aktywne leki",
-            comment: "Tytuł kafelka z liczbą leków w apteczce")
+            comment: "Title of the tile with the cabinet medicine count")
         static let statActiveCaption = LocalizedStringResource(
             "dashboard.stat.active.caption", defaultValue: "leki dostępne w domu",
-            comment: "Opis pod liczbą aktywnych leków")
+            comment: "Caption under the active medicine count")
         static let statOpenedTitle = LocalizedStringResource(
             "dashboard.stat.opened.title", defaultValue: "Otwarte",
-            comment: "Tytuł kafelka z liczbą otwartych opakowań")
+            comment: "Title of the tile with the opened-package count")
         static let statOpenedCaption = LocalizedStringResource(
             "dashboard.stat.opened.caption", defaultValue: "opakowania otwarte",
-            comment: "Opis pod liczbą otwartych opakowań")
+            comment: "Caption under the opened-package count")
         static let statExpiringTitle = LocalizedStringResource(
             "dashboard.stat.expiring.title", defaultValue: "Wkrótce wygasają",
-            comment: "Tytuł kafelka z liczbą leków bliskich przeterminowania")
+            comment: "Title of the tile with medicines nearing expiry")
         static let statExpiringCaption = LocalizedStringResource(
             "dashboard.stat.expiring.caption", defaultValue: "w ciągu najbliższych 30 dni",
-            comment: "Opis pod liczbą leków bliskich przeterminowania")
+            comment: "Caption under the count of medicines nearing expiry")
 
         static let medicinesTitle = LocalizedStringResource(
             "dashboard.medicines.title", defaultValue: "Leki w domu",
-            comment: "Nagłówek sekcji z aktywnymi lekami")
+            comment: "Header for the active medicines section")
         static let seeAll = LocalizedStringResource(
             "dashboard.medicines.see_all", defaultValue: "Zobacz wszystkie",
-            comment: "Przycisk przechodzący do pełnej listy leków")
+            comment: "Button that opens the full medicine list")
         static let emptyTitle = LocalizedStringResource(
             "dashboard.empty.title", defaultValue: "Dodaj pierwszy lek",
-            comment: "Nagłówek pustej apteczki")
+            comment: "Header for an empty cabinet")
         static let emptyMessage = LocalizedStringResource(
             "dashboard.empty.message",
             defaultValue: "Dane leku będą bezpiecznie zapisane i łatwe do znalezienia.",
-            comment: "Opis pod nagłówkiem pustej apteczki")
+            comment: "Description under the empty-cabinet header")
 
         static let attentionTitle = LocalizedStringResource(
             "dashboard.attention.title", defaultValue: "Wymagają uwagi",
-            comment: "Nagłówek panelu z lekami przeterminowanymi")
+            comment: "Header of the expired-medicines panel")
         static let attentionAllGood = LocalizedStringResource(
             "dashboard.attention.all_good",
             defaultValue: "Wszystkie leki mają aktualny termin ważności.",
-            comment: "Komunikat, gdy nic nie jest przeterminowane")
+            comment: "Message when nothing is expired")
 
         static func attentionCount(_ count: Int) -> LocalizedStringResource {
             LocalizedStringResource(
                 "dashboard.attention.count",
                 defaultValue: "\(count) leków jest przeterminowanych",
-                comment: "Liczba przeterminowanych leków w panelu Wymagają uwagi")
+                comment: "Expired medicine count in the Needs attention panel")
         }
     }
 
     enum Medicines {
         static let title = LocalizedStringResource(
             "medicines.title", defaultValue: "Leki",
-            comment: "Tytuł ekranu z listą leków")
+            comment: "Title of the medicine list screen")
         static let add = LocalizedStringResource(
             "medicines.add", defaultValue: "Dodaj lek",
-            comment: "Akcja otwierająca formularz nowego leku")
+            comment: "Action that opens the new-medicine form")
         static let searchPrompt = LocalizedStringResource(
             "medicines.search_prompt", defaultValue: "Szukaj leku, zastosowania lub osoby",
-            comment: "Podpowiedź w polu wyszukiwania")
+            comment: "Search field placeholder")
         static let emptyTitle = LocalizedStringResource(
             "medicines.empty.title", defaultValue: "Apteczka jest pusta",
-            comment: "Nagłówek pustej listy leków")
+            comment: "Header for an empty medicine list")
         static let emptyMessage = LocalizedStringResource(
             "medicines.empty.message",
             defaultValue: "Dodaj lek, aby mieć pod ręką termin ważności i dawkowanie.",
-            comment: "Opis pustej listy leków")
+            comment: "Description for an empty medicine list")
         static let noResultsTitle = LocalizedStringResource(
             "medicines.no_results.title", defaultValue: "Brak wyników",
-            comment: "Nagłówek, gdy wyszukiwanie nic nie znalazło")
+            comment: "Header when search finds nothing")
         static let noResultsMessage = LocalizedStringResource(
             "medicines.no_results.message",
             defaultValue: "Spróbuj innej nazwy, substancji czynnej lub imienia.",
-            comment: "Opis, gdy wyszukiwanie nic nie znalazło")
+            comment: "Description when search finds nothing")
 
         static let sectionExpired = LocalizedStringResource(
             "medicines.section.expired", defaultValue: "Przeterminowane",
-            comment: "Nagłówek sekcji listy z lekami po terminie")
+            comment: "List section header for expired medicines")
         static let sectionExpiringSoon = LocalizedStringResource(
             "medicines.section.expiring_soon", defaultValue: "Wkrótce wygasają",
-            comment: "Nagłówek sekcji listy z lekami bliskimi terminu")
+            comment: "List section header for medicines nearing expiry")
         static let sectionValid = LocalizedStringResource(
             "medicines.section.valid", defaultValue: "Aktualne",
-            comment: "Nagłówek sekcji listy z lekami w terminie")
+            comment: "List section header for medicines still valid")
 
         static let sort = LocalizedStringResource(
             "medicines.sort", defaultValue: "Sortowanie",
-            comment: "Menu wyboru kolejności listy")
+            comment: "Menu for choosing list sort order")
         static let sortByExpiry = LocalizedStringResource(
             "medicines.sort.expiry", defaultValue: "Termin ważności",
-            comment: "Sortowanie listy według terminu ważności")
+            comment: "Sort the list by expiry date")
         static let sortByName = LocalizedStringResource(
             "medicines.sort.name", defaultValue: "Nazwa",
-            comment: "Sortowanie listy alfabetycznie")
+            comment: "Sort the list alphabetically")
         static let sortByPerson = LocalizedStringResource(
             "medicines.sort.person", defaultValue: "Osoba",
-            comment: "Sortowanie listy według osoby")
+            comment: "Sort the list by person")
         static let deleteConfirmTitle = LocalizedStringResource(
             "medicines.delete.confirm.title", defaultValue: "Usunąć lek?",
-            comment: "Tytuł potwierdzenia trwałego usunięcia z aktywnej listy (Free)")
+            comment: "Confirm permanent delete from the active list (Free)")
         static let deleteConfirmMessage = LocalizedStringResource(
             "medicines.delete.confirm.message",
             defaultValue: "Lek zostanie trwale usunięty. W wersji Pro możesz zamiast tego przenieść go do archiwum.",
-            comment: "Treść potwierdzenia usunięcia bez archiwum")
+            comment: "Body of the delete confirmation when archive is unavailable")
     }
 
     enum Search {
         static func personToken(_ name: String) -> LocalizedStringResource {
             LocalizedStringResource(
                 "search.token.person", defaultValue: "Osoba: \(name)",
-                comment: "Token wyszukiwania zawężający wyniki do jednej osoby")
+                comment: "Search token that narrows results to one person")
         }
         static func indicationToken(_ indication: String) -> LocalizedStringResource {
             LocalizedStringResource(
                 "search.token.indication", defaultValue: "Zastosowanie: \(indication)",
-                comment: "Token wyszukiwania zawężający wyniki do jednej dolegliwości")
+                comment: "Search token that narrows results to one indication")
         }
         static func substanceToken(_ substance: String) -> LocalizedStringResource {
             LocalizedStringResource(
                 "search.token.substance", defaultValue: "Substancja: \(substance)",
-                comment: "Token wyszukiwania zawężający wyniki do jednej substancji czynnej")
+                comment: "Search token that narrows results to one active substance")
         }
     }
 
     enum Detail {
         static let substance = LocalizedStringResource(
             "detail.substance", defaultValue: "Substancja czynna",
-            comment: "Etykieta pola z substancją czynną")
+            comment: "Label for the active substance field")
         static let person = LocalizedStringResource(
             "detail.person", defaultValue: "Na kogo przepisany",
-            comment: "Etykieta pola z osobą, dla której lek przepisano")
+            comment: "Label for the person the medicine was prescribed for")
         static let indication = LocalizedStringResource(
             "detail.indication", defaultValue: "Na co przepisany",
-            comment: "Etykieta pola z dolegliwością")
+            comment: "Label for the indication field")
         static let dosage = LocalizedStringResource(
             "detail.dosage", defaultValue: "Dawkowanie",
-            comment: "Etykieta pola z dawkowaniem")
+            comment: "Label for the dosage field")
         static let quantity = LocalizedStringResource(
             "detail.quantity", defaultValue: "Ilość / opakowanie",
-            comment: "Etykieta pola z wielkością opakowania")
+            comment: "Label for the package size field")
         static let form = LocalizedStringResource(
             "detail.form", defaultValue: "Postać",
-            comment: "Etykieta pola z postacią leku")
+            comment: "Label for the medicine form field")
         static let expiry = LocalizedStringResource(
             "detail.expiry", defaultValue: "Termin ważności",
-            comment: "Etykieta pola z terminem z opakowania")
+            comment: "Label for the package expiry field")
         static let openedExpiry = LocalizedStringResource(
             "detail.opened_expiry", defaultValue: "Ważny po otwarciu do",
-            comment: "Etykieta pola z terminem liczonym od otwarcia")
+            comment: "Label for the post-opening expiry field")
         static let openedAt = LocalizedStringResource(
             "detail.opened_at", defaultValue: "Otwarty",
-            comment: "Etykieta pola z datą otwarcia opakowania")
+            comment: "Label for the package opening date field")
         static let notes = LocalizedStringResource(
             "detail.notes", defaultValue: "Notatki",
-            comment: "Etykieta pola z notatkami")
+            comment: "Label for the notes field")
         static let added = LocalizedStringResource(
             "detail.added", defaultValue: "Dodany",
-            comment: "Etykieta pola z datą dodania leku do apteczki")
+            comment: "Label for the date the medicine was added to the cabinet")
         static let effectiveExpiry = LocalizedStringResource(
             "detail.effective_expiry", defaultValue: "Obowiązujący termin",
-            comment: "Etykieta wcześniejszego z dwóch terminów ważności")
+            comment: "Label for the earlier of the two expiry dates")
 
         static let markOpened = LocalizedStringResource(
             "detail.mark_opened", defaultValue: "Oznacz jako otwarty",
-            comment: "Akcja odnotowująca otwarcie opakowania")
+            comment: "Action that records package opening")
         static let markUnopened = LocalizedStringResource(
             "detail.mark_unopened", defaultValue: "Oznacz jako nieotwarty",
-            comment: "Akcja cofająca oznaczenie otwarcia")
+            comment: "Action that clears the opened mark")
         static let archive = LocalizedStringResource(
             "detail.archive", defaultValue: "Przenieś do archiwum",
-            comment: "Akcja usuwająca lek z apteczki, ale zachowująca go w historii")
+            comment: "Action that removes a medicine from the cabinet but keeps it in history")
         static let archiveTitle = LocalizedStringResource(
             "detail.archive.title", defaultValue: "Powód archiwizacji",
-            comment: "Nagłówek pytania o powód przeniesienia leku do archiwum")
+            comment: "Header asking why the medicine is being archived")
     }
 
     enum Form {
         static let titleNew = LocalizedStringResource(
             "form.title.new", defaultValue: "Nowy lek",
-            comment: "Tytuł formularza dodawania leku")
+            comment: "Title of the add-medicine form")
         static let titleEdit = LocalizedStringResource(
             "form.title.edit", defaultValue: "Edycja leku",
-            comment: "Tytuł formularza edycji leku")
+            comment: "Title of the edit-medicine form")
 
         static let sectionMedicine = LocalizedStringResource(
             "form.section.medicine", defaultValue: "Lek",
-            comment: "Nagłówek sekcji z nazwą i opakowaniem")
+            comment: "Section header for name and package")
         static let sectionPrescription = LocalizedStringResource(
             "form.section.prescription", defaultValue: "Recepta",
-            comment: "Nagłówek sekcji z osobą, dolegliwością i dawkowaniem")
+            comment: "Section header for person, indication, and dosage")
         static let sectionExpiry = LocalizedStringResource(
             "form.section.expiry", defaultValue: "Ważność",
-            comment: "Nagłówek sekcji z terminami ważności")
+            comment: "Section header for expiry dates")
         static let sectionNotes = LocalizedStringResource(
             "form.section.notes", defaultValue: "Notatki",
-            comment: "Nagłówek sekcji z dodatkowymi uwagami")
+            comment: "Section header for extra notes")
 
         static let name = LocalizedStringResource(
             "form.name", defaultValue: "Nazwa leku",
-            comment: "Etykieta pola nazwy")
+            comment: "Label for the name field")
         static let namePrompt = LocalizedStringResource(
             "form.name.prompt", defaultValue: "np. Apap",
-            comment: "Przykładowa wartość w polu nazwy")
+            comment: "Example value in the name field")
         static let substancePrompt = LocalizedStringResource(
             "form.substance.prompt", defaultValue: "np. paracetamol",
-            comment: "Przykładowa wartość w polu substancji czynnej")
+            comment: "Example value in the active substance field")
         static let quantityPrompt = LocalizedStringResource(
             "form.quantity.prompt", defaultValue: "np. 20 tabletek",
-            comment: "Przykładowa wartość w polu wielkości opakowania")
+            comment: "Example value in the package size field")
         static let personPrompt = LocalizedStringResource(
             "form.person.prompt", defaultValue: "np. Ania",
-            comment: "Przykładowa wartość w polu osoby")
+            comment: "Example value in the person field")
         static let indicationPrompt = LocalizedStringResource(
             "form.indication.prompt", defaultValue: "np. ból głowy",
-            comment: "Przykładowa wartość w polu dolegliwości")
+            comment: "Example value in the indication field")
         static let dosagePrompt = LocalizedStringResource(
             "form.dosage.prompt", defaultValue: "np. 1 tabletka co 8 godzin",
-            comment: "Przykładowa wartość w polu dawkowania")
+            comment: "Example value in the dosage field")
         static let notesPrompt = LocalizedStringResource(
             "form.notes.prompt", defaultValue: "Dodatkowe informacje",
-            comment: "Przykładowa wartość w polu notatek")
+            comment: "Example value in the notes field")
 
         static let opened = LocalizedStringResource(
             "form.opened", defaultValue: "Opakowanie otwarte",
-            comment: "Przełącznik oznaczający otwarte opakowanie")
+            comment: "Toggle marking the package as opened")
         static let openedAt = LocalizedStringResource(
             "form.opened_at", defaultValue: "Data otwarcia",
-            comment: "Etykieta wyboru daty otwarcia")
+            comment: "Label for choosing the opening date")
         static let daysAfterOpening = LocalizedStringResource(
             "form.days_after_opening", defaultValue: "Ważny po otwarciu",
-            comment: "Etykieta liczby dni przydatności po otwarciu")
+            comment: "Label for days of usability after opening")
         static let useCustomDate = LocalizedStringResource(
             "form.use_custom_date", defaultValue: "Ustaw konkretną datę",
-            comment: "Przełącznik zastępujący liczbę dni wyborem daty")
+            comment: "Toggle that replaces the day count with a date picker")
         static let customDate = LocalizedStringResource(
             "form.custom_date", defaultValue: "Ważny po otwarciu do",
-            comment: "Etykieta ręcznie wybranej daty ważności po otwarciu")
+            comment: "Label for a manually chosen post-opening expiry date")
         static let suggestions = LocalizedStringResource(
             "form.suggestions", defaultValue: "Podpowiedzi",
-            comment: "Nagłówek listy wcześniej wpisanych wartości")
+            comment: "Header for previously entered value suggestions")
 
         static func days(_ count: Int) -> LocalizedStringResource {
             LocalizedStringResource(
                 "form.days_value", defaultValue: "\(count) dni",
-                comment: "Liczba dni przydatności po otwarciu")
+                comment: "Day count for usability after opening")
         }
     }
 
     enum Status {
         static let valid = LocalizedStringResource(
             "status.valid", defaultValue: "Aktualny",
-            comment: "Znacznik leku w terminie")
+            comment: "Badge for a medicine still within date")
         static let expiringSoon = LocalizedStringResource(
             "status.expiring_soon", defaultValue: "Wygasa wkrótce",
-            comment: "Znacznik leku bliskiego przeterminowania")
+            comment: "Badge for a medicine nearing expiry")
         static let expired = LocalizedStringResource(
             "status.expired", defaultValue: "Przeterminowany",
-            comment: "Znacznik leku po terminie")
+            comment: "Badge for an expired medicine")
         static let opened = LocalizedStringResource(
             "status.opened", defaultValue: "Otwarty",
-            comment: "Znacznik otwartego opakowania")
+            comment: "Badge for an opened package")
         static let expiresToday = LocalizedStringResource(
             "status.expires_today", defaultValue: "Wygasa dziś",
-            comment: "Opis terminu upływającego dzisiaj")
+            comment: "Description when expiry is today")
 
         static func expiresIn(days: Int) -> LocalizedStringResource {
             LocalizedStringResource(
                 "status.expires_in_days", defaultValue: "Wygasa za \(days) dni",
-                comment: "Liczba dni pozostałych do końca ważności")
+                comment: "Days remaining until expiry")
         }
         static func expiredAgo(days: Int) -> LocalizedStringResource {
             LocalizedStringResource(
                 "status.expired_days_ago", defaultValue: "Po terminie od \(days) dni",
-                comment: "Liczba dni, które minęły od utraty ważności")
+                comment: "Days since the medicine expired")
         }
     }
 
     enum Archive {
         static let title = LocalizedStringResource(
             "archive.title", defaultValue: "Archiwum",
-            comment: "Tytuł ekranu z historią leków")
+            comment: "Title of the medicine history screen")
         static let subtitle = LocalizedStringResource(
             "archive.subtitle", defaultValue: "Leki, które kiedyś były w apteczce",
-            comment: "Podtytuł ekranu archiwum")
+            comment: "Subtitle of the archive screen")
         static let emptyTitle = LocalizedStringResource(
             "archive.empty.title", defaultValue: "Archiwum jest puste",
-            comment: "Nagłówek pustego archiwum")
+            comment: "Header for an empty archive")
         static let emptyMessage = LocalizedStringResource(
             "archive.empty.message",
             defaultValue: "Leki przeniesione do archiwum zostaną tu zapisane jako historia.",
-            comment: "Opis pustego archiwum")
+            comment: "Description for an empty archive")
         static let searchPrompt = LocalizedStringResource(
             "archive.search_prompt", defaultValue: "Szukaj w archiwum",
-            comment: "Podpowiedź w polu wyszukiwania archiwum")
+            comment: "Archive search field placeholder")
         static let archivedAt = LocalizedStringResource(
             "archive.archived_at", defaultValue: "Zarchiwizowany",
-            comment: "Etykieta daty przeniesienia do archiwum")
+            comment: "Label for the archive date")
         static let restore = LocalizedStringResource(
             "archive.restore", defaultValue: "Przywróć do apteczki",
-            comment: "Akcja przywracająca lek z archiwum")
+            comment: "Action that restores a medicine from the archive")
         static let deleteConfirmTitle = LocalizedStringResource(
             "archive.delete.confirm.title", defaultValue: "Usunąć trwale?",
-            comment: "Tytuł potwierdzenia trwałego usunięcia")
+            comment: "Title of the permanent delete confirmation")
         static let deleteConfirmMessage = LocalizedStringResource(
             "archive.delete.confirm.message",
             defaultValue: "Lek zniknie z historii na wszystkich urządzeniach. Tej operacji nie można cofnąć.",
-            comment: "Treść potwierdzenia trwałego usunięcia")
+            comment: "Body of the permanent delete confirmation")
     }
 
     enum Expired {
         static let title = LocalizedStringResource(
             "expired.title", defaultValue: "Leki po terminie",
-            comment: "Tytuł arkusza pokazywanego przy starcie aplikacji")
+            comment: "Title of the sheet shown at app launch")
         static let archiveAll = LocalizedStringResource(
             "expired.archive_all", defaultValue: "Przenieś wszystkie do archiwum",
-            comment: "Akcja archiwizująca wszystkie przeterminowane leki")
+            comment: "Action that archives all expired medicines")
         static let deleteAll = LocalizedStringResource(
             "expired.delete_all", defaultValue: "Usuń wszystkie",
-            comment: "Akcja trwale usuwająca przeterminowane leki w wersji Free")
+            comment: "Action that permanently deletes expired medicines on Free")
         static let archiveOne = LocalizedStringResource(
             "expired.archive_one", defaultValue: "Do archiwum",
-            comment: "Akcja archiwizująca pojedynczy lek")
+            comment: "Action that archives a single medicine")
         static let later = LocalizedStringResource(
             "expired.later", defaultValue: "Nie teraz",
-            comment: "Zamknięcie arkusza bez archiwizowania")
+            comment: "Dismisses the sheet without archiving")
         static let footnote = LocalizedStringResource(
             "expired.footnote",
             defaultValue: "Zarchiwizowane leki znikają z apteczki, ale zostają w historii.",
-            comment: "Wyjaśnienie, że archiwizacja nie kasuje danych")
+            comment: "Explains that archiving does not delete data")
 
         static func message(_ count: Int) -> LocalizedStringResource {
             LocalizedStringResource(
                 "expired.message",
                 defaultValue: "\(count) leków w Twojej apteczce straciło ważność.",
-                comment: "Podsumowanie liczby przeterminowanych leków")
+                comment: "Summary of the expired medicine count")
         }
         static func expiredOn(_ dateText: String) -> LocalizedStringResource {
             LocalizedStringResource(
                 "expired.expired_on", defaultValue: "Termin minął \(dateText)",
-                comment: "Data utraty ważności w arkuszu przeterminowanych leków")
+                comment: "Expiry date in the expired-medicines sheet")
         }
     }
 
     enum Menu {
         static let newMedicine = LocalizedStringResource(
             "menu.new_medicine", defaultValue: "Nowy lek",
-            comment: "Pozycja menu na Macu otwierająca formularz")
+            comment: "Mac menu item that opens the form")
         static let search = LocalizedStringResource(
             "menu.search", defaultValue: "Szukaj",
-            comment: "Pozycja menu na Macu ustawiająca kursor w wyszukiwarce")
+            comment: "Mac menu item that focuses the search field")
     }
 
     enum Paywall {
         static let title = LocalizedStringResource(
             "paywall.title", defaultValue: "Aegis Pro",
-            comment: "Tytuł arkusza subskrypcji")
+            comment: "Title of the subscription sheet")
         static let headline = LocalizedStringResource(
             "paywall.headline", defaultValue: "Apteczka dla całej rodziny",
-            comment: "Nagłówek paywalla")
+            comment: "Paywall headline")
         static let subtitle = LocalizedStringResource(
             "paywall.subtitle",
             defaultValue: "Synchronizacja iCloud, archiwum i wspólna apteczka przez Family Sharing.",
-            comment: "Podtytuł paywalla")
+            comment: "Paywall subtitle")
         static let benefitSync = LocalizedStringResource(
             "paywall.benefit.sync", defaultValue: "Sync na iPhonie, iPadzie i Macu",
-            comment: "Korzyść Pro: synchronizacja")
+            comment: "Pro benefit: sync")
         static let benefitFamily = LocalizedStringResource(
             "paywall.benefit.family", defaultValue: "Wspólna apteczka w rodzinie",
-            comment: "Korzyść Pro: udostępnianie")
+            comment: "Pro benefit: sharing")
         static let benefitArchive = LocalizedStringResource(
             "paywall.benefit.archive", defaultValue: "Archiwum i przywracanie leków",
-            comment: "Korzyść Pro: archiwum")
+            comment: "Pro benefit: archive")
         static let restore = LocalizedStringResource(
             "paywall.restore", defaultValue: "Przywróć zakupy",
-            comment: "Przycisk przywracania zakupów StoreKit")
+            comment: "Button to restore StoreKit purchases")
         static let debugUnlock = LocalizedStringResource(
             "paywall.debug_unlock", defaultValue: "Odblokuj Pro (debug)",
-            comment: "Tymczasowe odblokowanie Pro w buildach debug")
+            comment: "Temporary Pro unlock in debug builds")
     }
 
     enum Settings {
         static let title = LocalizedStringResource(
             "settings.title", defaultValue: "Ustawienia",
-            comment: "Tytuł ekranu ustawień")
+            comment: "Title of the settings screen")
         static let subscriptionSection = LocalizedStringResource(
             "settings.subscription", defaultValue: "Subskrypcja",
-            comment: "Sekcja statusu Pro")
+            comment: "Pro status section")
         static let status = LocalizedStringResource(
             "settings.status", defaultValue: "Status",
-            comment: "Etykieta statusu subskrypcji")
+            comment: "Subscription status label")
         static let statusFree = LocalizedStringResource(
             "settings.status.free", defaultValue: "Free",
-            comment: "Status bez subskrypcji")
+            comment: "Status without a subscription")
         static let statusPro = LocalizedStringResource(
             "settings.status.pro", defaultValue: "Pro",
-            comment: "Status z aktywnym Pro")
+            comment: "Status with active Pro")
         static let upgrade = LocalizedStringResource(
             "settings.upgrade", defaultValue: "Przejdź na Pro",
-            comment: "Przycisk otwierający paywall")
+            comment: "Button that opens the paywall")
         static let manageSubscription = LocalizedStringResource(
             "settings.manage", defaultValue: "Zarządzaj subskrypcją",
-            comment: "Link do zarządzania subskrypcją w App Store")
+            comment: "Link to manage the subscription in the App Store")
         static let syncSection = LocalizedStringResource(
             "settings.sync", defaultValue: "Synchronizacja",
-            comment: "Sekcja statusu iCloud")
+            comment: "iCloud status section")
         static let iCloudStatus = LocalizedStringResource(
             "settings.icloud.status", defaultValue: "Konto iCloud",
-            comment: "Etykieta statusu konta iCloud")
+            comment: "iCloud account status label")
         static let iCloudAvailable = LocalizedStringResource(
             "settings.icloud.available", defaultValue: "Dostępne",
-            comment: "iCloud dostępne")
+            comment: "iCloud available")
         static let iCloudNoAccount = LocalizedStringResource(
             "settings.icloud.no_account", defaultValue: "Brak konta",
-            comment: "Brak zalogowanego iCloud")
+            comment: "No signed-in iCloud account")
         static let iCloudRestricted = LocalizedStringResource(
             "settings.icloud.restricted", defaultValue: "Ograniczone",
-            comment: "iCloud ograniczone")
+            comment: "iCloud restricted")
         static let iCloudUnknown = LocalizedStringResource(
             "settings.icloud.unknown", defaultValue: "Nieznany",
-            comment: "Nieznany status iCloud")
+            comment: "Unknown iCloud status")
         static let iCloudUnavailable = LocalizedStringResource(
             "settings.icloud.unavailable",
             defaultValue: "iCloud jest niedostępne na tym urządzeniu.",
-            comment: "Komunikat gdy sync nie może wystartować")
+            comment: "Message when sync cannot start")
         static let syncActive = LocalizedStringResource(
             "settings.sync.active", defaultValue: "Sync aktywny",
-            comment: "CloudSync działa")
+            comment: "CloudSync is running")
         static let syncInactive = LocalizedStringResource(
             "settings.sync.inactive", defaultValue: "Sync nieaktywny",
-            comment: "CloudSync wyłączony")
+            comment: "CloudSync is off")
         static let syncNow = LocalizedStringResource(
             "settings.sync.now", defaultValue: "Synchronizuj teraz",
-            comment: "Ręczne odświeżenie CloudKit")
+            comment: "Manual CloudKit refresh")
         static let sharingSection = LocalizedStringResource(
             "settings.sharing", defaultValue: "Rodzina",
-            comment: "Sekcja CKShare")
+            comment: "CKShare section")
         static let shareCabinet = LocalizedStringResource(
             "settings.share", defaultValue: "Udostępnij apteczkę",
-            comment: "Przycisk otwierający CKShare")
+            comment: "Button that opens CKShare")
         static let shareTitle = LocalizedStringResource(
             "settings.share.title", defaultValue: "Domowa apteczka",
-            comment: "Tytuł CKShare")
+            comment: "CKShare title")
         static let shareFootnote = LocalizedStringResource(
             "settings.share.footnote",
             defaultValue: "Zaproszeni członkowie rodziny zobaczą te same leki na swoich urządzeniach.",
-            comment: "Wyjaśnienie udostępniania apteczki")
+            comment: "Explains sharing the medicine cabinet")
     }
 
-    /// Klucze powiadomień są rozwiązywane dopiero w chwili dostarczenia
-    /// (`NSString.localizedUserNotificationString`), dlatego są tu tylko stałymi tekstowymi.
+    /// Notification keys are resolved only at delivery time
+    /// (`NSString.localizedUserNotificationString`), so they are plain string constants here.
     enum NotificationKey {
         static let expiringTitle = "notification.expiring.title"
         static let expiredTitle = "notification.expired.title"

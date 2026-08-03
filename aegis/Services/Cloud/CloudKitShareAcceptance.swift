@@ -9,7 +9,7 @@ import SwiftUI
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-/// Przyjmuje zaproszenia CKShare w cyklu życia UIScene (iOS 26+).
+/// Accepts CKShare invitations in the UIScene lifecycle (iOS 26+).
 final class AegisAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,

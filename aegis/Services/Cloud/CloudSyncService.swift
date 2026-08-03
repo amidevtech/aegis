@@ -7,7 +7,7 @@ import CloudKit
 import Foundation
 import Observation
 
-/// Mirror LocalStore ↔ CloudKit (private zone + shared DB po akceptacji CKShare).
+/// Mirror LocalStore ↔ CloudKit (private zone + shared DB after accepting a CKShare).
 @MainActor
 @Observable
 final class CloudSyncService {
@@ -105,7 +105,7 @@ final class CloudSyncService {
             try await privateDatabase.deleteRecord(withID: MedicineRecordCoder.recordID(for: uuid))
             lastErrorMessage = nil
         } catch let error as CKError where error.code == .unknownItem {
-            // Już usunięty w chmurze.
+            // Already deleted in the cloud.
         } catch {
             lastErrorMessage = error.localizedDescription
         }
@@ -158,9 +158,9 @@ final class CloudSyncService {
         do {
             _ = try await privateDatabase.save(zone)
         } catch let error as CKError where error.code == .serverRecordChanged {
-            // Strefa już istnieje.
+            // Zone already exists.
         } catch let error as CKError where error.code == .partialFailure {
-            // Częściowy sukces przy istniejącej strefie — kontynuuj.
+            // Partial success when the zone already exists — continue.
         }
 
         let cabinetID = MedicineRecordCoder.cabinetRecordID()
@@ -181,7 +181,7 @@ final class CloudSyncService {
             MedicineRecordCoder.makeRecord(from: MedicineCloudSnapshot(from: $0))
         }
 
-        // Chunk, żeby nie przekroczyć limitu CloudKit.
+        // Chunk writes so we stay under the CloudKit limit.
         for chunk in records.chunked(into: 200) {
             _ = try await privateDatabase.modifyRecords(saving: chunk, deleting: [])
         }

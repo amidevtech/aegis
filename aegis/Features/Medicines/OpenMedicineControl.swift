@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Sekcja formularza odpowiadająca za otwarcie opakowania i termin liczony od otwarcia.
+/// Form section for marking a package opened and the post-opening expiry.
 struct OpenMedicineControl: View {
     @Binding var draft: MedicineDraft
 

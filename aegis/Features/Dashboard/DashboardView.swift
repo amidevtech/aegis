@@ -6,8 +6,8 @@
 import SwiftData
 import SwiftUI
 
-/// Ekran przeglądu: powitanie, trzy kafelki podsumowania, lista leków i panel
-/// z lekami po terminie - układ przeniesiony z szablonu webowego.
+/// Overview screen: greeting, three summary tiles, medicine list, and a panel
+/// for expired medicines — layout carried over from the web template.
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Environment(MedicineRepository.self) private var repository
@@ -92,7 +92,7 @@ struct DashboardView: View {
             set: { if !$0 { medicinesPendingDeletion = [] } })
     }
 
-    // MARK: - Nagłówek
+    // MARK: - Header
 
     private var heading: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -113,7 +113,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Kafelki
+    // MARK: - Tiles
 
     private var statsGrid: some View {
         LazyVGrid(
@@ -149,7 +149,7 @@ struct DashboardView: View {
         }
     }
 
-    // MARK: - Panele
+    // MARK: - Panels
 
     private var panels: some View {
         ViewThatFits(in: .horizontal) {
@@ -317,7 +317,7 @@ struct DashboardView: View {
         .modelContainer(container)
 }
 
-#Preview("Pusta apteczka") {
+#Preview("Empty cabinet") {
     let container = PreviewData.emptyContainer
     let services = AppServices(modelContainer: container)
     return DashboardView()

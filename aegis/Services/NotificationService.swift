@@ -6,26 +6,26 @@
 import Foundation
 import UserNotifications
 
-/// Planuje lokalne przypomnienia o zbliżających się terminach ważności.
+/// Schedules local reminders for approaching expiry dates.
 ///
-/// Treści są zapisywane jako klucze, a nie gotowe teksty - system tłumaczy je
-/// dopiero przy dostarczeniu, więc powiadomienie zaplanowane pół roku temu
-/// pojawi się w języku ustawionym dzisiaj.
+/// Bodies are stored as keys, not finished copy — the system localizes them
+/// at delivery time, so a notification scheduled six months ago appears
+/// in whichever language is set today.
 @Observable
 final class NotificationService {
     static let shared = NotificationService()
 
-    /// Ile dni przed terminem wysyłamy przypomnienie.
+    /// How many days before expiry we send a reminder.
     private static let leadTimesInDays = [30, 7, 0]
 
-    /// Godzina powiadomienia - rano, żeby dało się zareagować w ciągu dnia.
+    /// Notification hour — morning, so there is time to react during the day.
     private static let notificationHour = 9
 
     private let center = UNUserNotificationCenter.current()
 
     private init() {}
 
-    // MARK: - Zgoda
+    // MARK: - Permission
 
     var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
@@ -40,10 +40,10 @@ final class NotificationService {
         }
     }
 
-    /// Pyta o zgodę tylko przy pierwszym użyciu. Zwraca `true`, gdy wolno planować.
+    /// Asks for permission only on first use. Returns `true` when scheduling is allowed.
     @discardableResult
     func requestAuthorizationIfNeeded() async -> Bool {
-        // Unit testy nie powinny odpalać systemowego dialogu powiadomień.
+        // Unit tests should not trigger the system notification dialog.
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
             return false
         }
@@ -59,12 +59,12 @@ final class NotificationService {
         }
     }
 
-    // MARK: - Planowanie
+    // MARK: - Scheduling
 
-    /// Przeplanowuje przypomnienia dla całej apteczki.
+    /// Reschedules reminders for the whole cabinet.
     ///
-    /// Pełna synchronizacja zamiast księgowania pojedynczych zmian - jest odporna
-    /// na rozjazd stanu po edycji na innym urządzeniu.
+    /// Full sync instead of bookkeeping individual changes — resilient to
+    /// state drift after edits on another device.
     func sync(medicines: [Medicine]) async {
         await refreshAuthorizationStatus()
         guard isAuthorized else { return }
@@ -78,7 +78,7 @@ final class NotificationService {
         }
     }
 
-    /// Przeplanowuje przypomnienia jednego leku po edycji lub otwarciu opakowania.
+    /// Reschedules reminders for one medicine after an edit or package opening.
     func reschedule(for medicine: Medicine) async {
         cancel(for: medicine)
         guard !medicine.isArchived, await requestAuthorizationIfNeeded() else { return }
@@ -95,7 +95,7 @@ final class NotificationService {
             withIdentifiers: Self.leadTimesInDays.map { identifier(for: medicine, leadDays: $0) })
     }
 
-    // MARK: - Szczegóły
+    // MARK: - Details
 
     private func identifier(for medicine: Medicine, leadDays: Int) -> String {
         "\(medicine.uuid.uuidString)-\(leadDays)"

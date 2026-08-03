@@ -10,7 +10,7 @@ enum MedicineRepositoryError: Error, Equatable {
     case requiresPro
 }
 
-/// Jedyny punkt mutacji leków z UI: LocalStore zawsze, CloudSync gdy Pro.
+/// Single mutation entry point from UI: LocalStore always, CloudSync when Pro.
 @MainActor
 @Observable
 final class MedicineRepository {
@@ -91,7 +91,7 @@ final class MedicineRepository {
         return .success(())
     }
 
-    /// Trwałe usunięcie — Free z aktywnej listy albo Pro z archiwum.
+    /// Permanent delete — Free from the active list, or Pro from the archive.
     func delete(_ medicine: Medicine) {
         let uuid = medicine.uuid
         NotificationService.shared.cancel(for: medicine)

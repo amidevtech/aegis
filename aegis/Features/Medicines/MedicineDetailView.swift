@@ -6,7 +6,7 @@
 import SwiftData
 import SwiftUI
 
-/// Szczegóły leku wraz z akcjami: otwarcie opakowania, edycja i archiwizacja.
+/// Medicine details with actions: open package, edit, and archive.
 struct MedicineDetailView: View {
     @Bindable var medicine: Medicine
 
@@ -135,7 +135,7 @@ struct MedicineDetailView: View {
         }
     }
 
-    // MARK: - Sekcje
+    // MARK: - Sections
 
     private var header: some View {
         HStack(alignment: .top, spacing: 14) {

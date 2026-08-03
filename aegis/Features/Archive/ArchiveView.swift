@@ -6,7 +6,7 @@
 import SwiftData
 import SwiftUI
 
-/// Historia apteczki (tylko Pro). Leki tu trafiają zamiast być kasowane.
+/// Cabinet history (Pro only). Medicines land here instead of being deleted.
 struct ArchiveView: View {
     @Environment(MedicineRepository.self) private var repository
 

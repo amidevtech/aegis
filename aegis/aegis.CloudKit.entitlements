@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Referencyjna kopia entitlementów iCloud.
-	     Aktywny plik to aegis.entitlements — CloudKit jest tam włączony,
-	     a sync uruchamia się dopiero przy entitlement Pro (StoreKit). -->
+	<!-- Reference copy of iCloud entitlements.
+	     The active file is aegis.entitlements — CloudKit is enabled there,
+	     and sync starts only with a Pro entitlement (StoreKit). -->
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.com.amidev.aegis</string>

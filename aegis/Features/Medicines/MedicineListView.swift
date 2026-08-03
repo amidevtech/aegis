@@ -22,7 +22,7 @@ enum MedicineSort: String, CaseIterable, Identifiable {
     }
 }
 
-/// Pełna lista leków w apteczce, z wyszukiwaniem i podziałem na sekcje według stanu ważności.
+/// Full cabinet list with search and sections grouped by expiry status.
 struct MedicineListView: View {
     @Environment(AppState.self) private var appState
     @Environment(MedicineRepository.self) private var repository
@@ -82,7 +82,7 @@ struct MedicineListView: View {
         }
     }
 
-    // MARK: - Treść
+    // MARK: - Content
 
     @ViewBuilder
     private var content: some View {
@@ -212,7 +212,7 @@ struct MedicineListView: View {
         }
     }
 
-    // MARK: - Filtrowanie
+    // MARK: - Filtering
 
     private var suggestedTokens: [MedicineSearchToken] {
         medicines.searchTokenSuggestions(matching: searchText)

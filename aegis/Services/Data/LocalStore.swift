@@ -6,7 +6,7 @@
 import Foundation
 import SwiftData
 
-/// Lokalny magazyn SwiftData. UI czyta przez `@Query`; zapisy idą przez ten store.
+/// Local SwiftData store. UI reads via `@Query`; writes go through this store.
 @MainActor
 final class LocalStore {
     let container: ModelContainer
@@ -26,7 +26,7 @@ final class LocalStore {
         do {
             try context.save()
         } catch {
-            assertionFailure("Nie udało się zapisać LocalStore: \(error)")
+            assertionFailure("Failed to save LocalStore: \(error)")
         }
     }
 
@@ -53,7 +53,7 @@ final class LocalStore {
         return try context.fetch(descriptor).first
     }
 
-    /// Wstawia lub aktualizuje lek przychodzący z CloudKit (mirror).
+    /// Inserts or updates a medicine mirrored from CloudKit.
     func upsertFromCloud(_ snapshot: MedicineCloudSnapshot) throws {
         if let existing = try medicine(uuid: snapshot.uuid) {
             if existing.modifiedAt >= snapshot.modifiedAt { return }

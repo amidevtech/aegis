@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-/// Stan pusty oparty o systemowy `ContentUnavailableView`, z opcjonalną akcją.
+/// Empty state built on system `ContentUnavailableView`, with an optional action.
 struct EmptyStateView: View {
     let systemImage: String
     let title: LocalizedStringResource

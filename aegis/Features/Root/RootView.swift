@@ -6,8 +6,8 @@
 import SwiftData
 import SwiftUI
 
-/// Nawigacja główna. `sidebarAdaptable` daje pasek zakładek na iPhonie,
-/// a boczny panel na iPadzie i Macu - najbliżej układu z szablonu webowego.
+/// Root navigation. `sidebarAdaptable` gives a tab bar on iPhone
+/// and a sidebar on iPad and Mac — closest to the web template layout.
 struct RootView: View {
     @Environment(AppState.self) private var appState
     @Environment(SubscriptionStore.self) private var subscriptionStore
@@ -18,7 +18,7 @@ struct RootView: View {
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var activeMedicines: [Medicine]
 
-    /// Znacznik ostatniego pokazania arkusza, żeby nie wyskakiwał przy każdym powrocie do apki.
+    /// Timestamp of the last sheet presentation, so it does not pop up on every return to the app.
     @AppStorage("lastExpiredAlertTimestamp") private var lastAlertTimestamp: Double = 0
 
     @State private var isPresentingExpiredAlert = false
@@ -94,7 +94,7 @@ struct RootView: View {
         }
     }
 
-    /// Arkusz pojawia się przy zimnym starcie oraz przy pierwszym otwarciu w danym dniu.
+    /// The sheet appears on cold launch and on the first open of the day.
     private func evaluateExpiredAlert(isColdLaunch: Bool) {
         guard !isPresentingExpiredAlert, !expiredMedicines.isEmpty else { return }
 

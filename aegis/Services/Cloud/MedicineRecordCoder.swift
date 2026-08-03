@@ -6,7 +6,7 @@
 import CloudKit
 import Foundation
 
-/// Mapowanie Medicine ↔ CKRecord (bez SwiftData).
+/// Medicine ↔ CKRecord mapping (no SwiftData).
 enum MedicineRecordCoder {
     static let recordType = "Medicine"
     static let cabinetRecordType = "Cabinet"

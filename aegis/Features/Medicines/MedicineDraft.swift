@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// Edytowalna kopia leku. Formularz pracuje na niej zamiast na obiekcie z bazy,
-/// dzięki czemu anulowanie nie zostawia po sobie częściowych zmian.
+/// Editable copy of a medicine. The form works on this instead of the stored
+/// object, so cancelling does not leave partial changes behind.
 nonisolated struct MedicineDraft {
     var name = ""
     var activeSubstance = ""
@@ -36,7 +36,7 @@ nonisolated struct MedicineDraft {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    /// Termin obowiązujący, pokazywany na żywo pod polami formularza.
+    /// Effective expiry, shown live under the form fields.
     var effectiveExpiryDate: Date {
         ExpiryCalculator.effectiveExpiry(
             packageExpiry: expiryDate,
@@ -86,8 +86,8 @@ nonisolated struct MedicineDraft {
         medicine.refreshEffectiveExpiry()
     }
 
-    /// Po zmianie postaci leku podpowiadamy typową przydatność po otwarciu,
-    /// o ile użytkownik nie ustawił własnej wartości.
+    /// After changing the medicine form, suggest the typical post-opening
+    /// shelf life unless the user already set their own value.
     mutating func applySuggestedShelfLife(for form: MedicineForm) {
         guard let suggested = form.suggestedDaysAfterOpening else { return }
         daysAfterOpening = suggested

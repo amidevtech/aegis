@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Powód, dla którego lek zniknął z apteczki. Zapisywany jako stabilny `rawValue`.
+/// Why a medicine left the cabinet. Stored as a stable `rawValue`.
 nonisolated enum ArchiveReason: String, CaseIterable, Identifiable, Hashable, Sendable {
     case expired
     case usedUp
@@ -25,13 +25,13 @@ nonisolated enum ArchiveReason: String, CaseIterable, Identifiable, Hashable, Se
         switch self {
         case .expired:
             LocalizedStringResource("archive_reason.expired", defaultValue: "Przeterminowany",
-                                    comment: "Powód archiwizacji leku")
+                                    comment: "Reason for archiving a medicine")
         case .usedUp:
             LocalizedStringResource("archive_reason.used_up", defaultValue: "Zużyty",
-                                    comment: "Powód archiwizacji leku")
+                                    comment: "Reason for archiving a medicine")
         case .removed:
             LocalizedStringResource("archive_reason.removed", defaultValue: "Usunięty z apteczki",
-                                    comment: "Powód archiwizacji leku")
+                                    comment: "Reason for archiving a medicine")
         }
     }
 }
