@@ -64,7 +64,10 @@ struct MedicineListView: View {
                     appState.isSearchFocusRequested = false
                 }
                 .confirmationDialog(
-                    Text(L10n.Medicines.deleteConfirmTitle),
+                    Text(
+                        subscriptionStore.isPro
+                            ? L10n.Archive.deleteConfirmTitle
+                            : L10n.Medicines.deleteConfirmTitle),
                     isPresented: deletionDialogBinding,
                     titleVisibility: .visible,
                     presenting: medicinePendingDeletion
@@ -77,7 +80,10 @@ struct MedicineListView: View {
                         medicinePendingDeletion = nil
                     }
                 } message: { _ in
-                    Text(L10n.Medicines.deleteConfirmMessage)
+                    Text(
+                        subscriptionStore.isPro
+                            ? L10n.Archive.deleteConfirmMessage
+                            : L10n.Medicines.deleteConfirmMessage)
                 }
         }
     }
@@ -131,6 +137,11 @@ struct MedicineListView: View {
                             MedicineRow(medicine: medicine, now: now)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                medicinePendingDeletion = medicine
+                            } label: {
+                                Label(L10n.Common.delete, systemImage: "trash.fill")
+                            }
                             if subscriptionStore.isPro {
                                 Button(role: .destructive) {
                                     let result = MedicineActions.archive(
@@ -142,12 +153,6 @@ struct MedicineListView: View {
                                     }
                                 } label: {
                                     Label(L10n.Detail.archive, systemImage: "archivebox.fill")
-                                }
-                            } else {
-                                Button(role: .destructive) {
-                                    medicinePendingDeletion = medicine
-                                } label: {
-                                    Label(L10n.Common.delete, systemImage: "trash.fill")
                                 }
                             }
                         }

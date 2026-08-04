@@ -6,7 +6,7 @@
 import SwiftData
 import SwiftUI
 
-/// Medicine details with actions: open package, edit, and archive.
+/// Medicine details with actions: open package, edit, archive, and delete.
 struct MedicineDetailView: View {
     @Bindable var medicine: Medicine
 
@@ -43,8 +43,11 @@ struct MedicineDetailView: View {
 
             Section(L10n.Form.sectionMedicine) {
                 LabeledContent {
-                    Label(medicine.form.label, systemImage: medicine.form.symbolName)
-                        .foregroundStyle(Theme.Palette.ink)
+                    HStack(spacing: 6) {
+                        Image(systemName: medicine.form.symbolName)
+                        Text(medicine.form.label)
+                    }
+                    .foregroundStyle(Theme.Palette.ink)
                 } label: {
                     Text(L10n.Detail.form)
                 }
@@ -72,13 +75,14 @@ struct MedicineDetailView: View {
                             Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
                         }
                     }
-                } else if subscriptionStore.isPro {
-                    Button(role: .destructive) {
-                        isPresentingArchiveOptions = true
-                    } label: {
-                        Label(L10n.Detail.archive, systemImage: "archivebox.fill")
-                    }
                 } else {
+                    if subscriptionStore.isPro {
+                        Button(role: .destructive) {
+                            isPresentingArchiveOptions = true
+                        } label: {
+                            Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                        }
+                    }
                     Button(role: .destructive) {
                         isPresentingDeleteConfirm = true
                     } label: {
@@ -121,7 +125,10 @@ struct MedicineDetailView: View {
             Button(L10n.Common.cancel, role: .cancel) {}
         }
         .confirmationDialog(
-            Text(L10n.Medicines.deleteConfirmTitle),
+            Text(
+                subscriptionStore.isPro
+                    ? L10n.Archive.deleteConfirmTitle
+                    : L10n.Medicines.deleteConfirmTitle),
             isPresented: $isPresentingDeleteConfirm,
             titleVisibility: .visible
         ) {
@@ -131,7 +138,10 @@ struct MedicineDetailView: View {
             }
             Button(L10n.Common.cancel, role: .cancel) {}
         } message: {
-            Text(L10n.Medicines.deleteConfirmMessage)
+            Text(
+                subscriptionStore.isPro
+                    ? L10n.Archive.deleteConfirmMessage
+                    : L10n.Medicines.deleteConfirmMessage)
         }
     }
 

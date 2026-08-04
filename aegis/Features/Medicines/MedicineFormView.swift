@@ -60,12 +60,12 @@ struct MedicineFormView: View {
 
     private var medicineSection: some View {
         Section(L10n.Form.sectionMedicine) {
-            TextField(L10n.Form.name, text: $draft.name, prompt: Text(L10n.Form.namePrompt))
+            formTextField(L10n.Form.name, text: $draft.name, prompt: L10n.Form.namePrompt)
 
-            TextField(
+            formTextField(
                 L10n.Detail.substance,
                 text: $draft.activeSubstance,
-                prompt: Text(L10n.Form.substancePrompt))
+                prompt: L10n.Form.substancePrompt)
             suggestions(for: \.activeSubstance) { draft.activeSubstance = $0 }
 
             Picker(selection: $draft.form) {
@@ -79,31 +79,31 @@ struct MedicineFormView: View {
                 draft.applySuggestedShelfLife(for: newValue)
             }
 
-            TextField(
+            formTextField(
                 L10n.Detail.quantity,
                 text: $draft.quantity,
-                prompt: Text(L10n.Form.quantityPrompt))
+                prompt: L10n.Form.quantityPrompt)
         }
     }
 
     private var prescriptionSection: some View {
         Section(L10n.Form.sectionPrescription) {
-            TextField(
+            formTextField(
                 L10n.Detail.person,
                 text: $draft.personName,
-                prompt: Text(L10n.Form.personPrompt))
+                prompt: L10n.Form.personPrompt)
             suggestions(for: \.personName) { draft.personName = $0 }
 
-            TextField(
+            formTextField(
                 L10n.Detail.indication,
                 text: $draft.indication,
-                prompt: Text(L10n.Form.indicationPrompt))
+                prompt: L10n.Form.indicationPrompt)
             suggestions(for: \.indication) { draft.indication = $0 }
 
-            TextField(
+            formTextField(
                 L10n.Detail.dosage,
                 text: $draft.dosage,
-                prompt: Text(L10n.Form.dosagePrompt))
+                prompt: L10n.Form.dosagePrompt)
         }
     }
 
@@ -134,14 +134,63 @@ struct MedicineFormView: View {
 
     private var notesSection: some View {
         Section(L10n.Form.sectionNotes) {
-            TextField(
+            formTextField(
                 L10n.Detail.notes,
                 text: $draft.notes,
-                prompt: Text(L10n.Form.notesPrompt),
-                axis: .vertical)
-                .lineLimit(3...6)
+                prompt: L10n.Form.notesPrompt,
+                axis: .vertical,
+                lineLimit: 3...6)
         }
     }
+
+    // MARK: - Fields
+
+    @ViewBuilder
+    private func formTextField(
+        _ title: LocalizedStringResource,
+        text: Binding<String>,
+        prompt: LocalizedStringResource,
+        axis: Axis = .horizontal,
+        lineLimit: ClosedRange<Int>? = nil
+    ) -> some View {
+        #if os(iOS)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            labeledField(
+                text: text,
+                prompt: prompt,
+                axis: axis,
+                lineLimit: lineLimit)
+            .accessibilityLabel(Text(title))
+        }
+        #else
+        if let lineLimit {
+            TextField(title, text: text, prompt: Text(prompt), axis: axis)
+                .lineLimit(lineLimit)
+        } else {
+            TextField(title, text: text, prompt: Text(prompt), axis: axis)
+        }
+        #endif
+    }
+
+    #if os(iOS)
+    @ViewBuilder
+    private func labeledField(
+        text: Binding<String>,
+        prompt: LocalizedStringResource,
+        axis: Axis,
+        lineLimit: ClosedRange<Int>?
+    ) -> some View {
+        if let lineLimit {
+            TextField("", text: text, prompt: Text(prompt), axis: axis)
+                .lineLimit(lineLimit)
+        } else {
+            TextField("", text: text, prompt: Text(prompt), axis: axis)
+        }
+    }
+    #endif
 
     // MARK: - Suggestions
 
