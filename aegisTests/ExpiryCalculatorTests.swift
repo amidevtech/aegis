@@ -105,14 +105,14 @@ struct ExpiryCalculatorTests {
             effectiveExpiry: date(2026, 3, 9), now: today, calendar: calendar) == .expired)
     }
 
-    @Test("The expiring-soon section boundary is 30 days")
+    @Test("The expiring-soon section boundary is 5 days")
     func statusThresholds() {
         let today = date(2026, 3, 10)
 
         #expect(ExpiryCalculator.status(
-            effectiveExpiry: date(2026, 4, 9), now: today, calendar: calendar) == .expiringSoon)
+            effectiveExpiry: date(2026, 3, 15), now: today, calendar: calendar) == .expiringSoon)
         #expect(ExpiryCalculator.status(
-            effectiveExpiry: date(2026, 4, 10), now: today, calendar: calendar) == .valid)
+            effectiveExpiry: date(2026, 3, 16), now: today, calendar: calendar) == .valid)
     }
 
     @Test("Days remaining is negative after expiry")

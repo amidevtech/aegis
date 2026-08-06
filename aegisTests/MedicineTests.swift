@@ -32,7 +32,9 @@ struct MedicineTests {
 
         #expect(medicine.isOpened)
         #expect(medicine.daysAfterOpening == 28)
-        #expect(medicine.status() == .expiringSoon)
+        // Suggested shelf life (28 days) is beyond the 5-day soon window.
+        #expect(medicine.status() == .valid)
+        #expect(medicine.daysRemaining() == 28)
     }
 
     @Test("Marking unopened restores the package expiry")
@@ -40,13 +42,35 @@ struct MedicineTests {
         let packageExpiry = daysFromNow(400)
         let medicine = Medicine(expiryDate: packageExpiry, form: .syrup)
         medicine.markOpened()
-        #expect(medicine.status() == .expiringSoon)
+        #expect(medicine.daysAfterOpening == 30)
+        #expect(medicine.daysRemaining() == 30)
+        #expect(medicine.status() == .valid)
 
         medicine.markUnopened()
 
         #expect(!medicine.isOpened)
         #expect(medicine.openedAt == nil)
         #expect(medicine.status() == .valid)
+        #expect(
+            medicine.effectiveExpiryDate
+                == Calendar.current.startOfDay(for: packageExpiry))
+    }
+
+    @Test("Medicines within 5 days of expiry are marked expiring soon")
+    func statusIsExpiringSoonWithinFiveDays() {
+        #expect(MedicineStatus.soonThresholdInDays == 5)
+
+        let onThreshold = Medicine(expiryDate: daysFromNow(5))
+        let justOutside = Medicine(expiryDate: daysFromNow(6))
+        let expiresToday = Medicine(expiryDate: daysFromNow(0))
+        let expired = Medicine(expiryDate: daysFromNow(-1))
+
+        #expect(onThreshold.status() == .expiringSoon)
+        #expect(onThreshold.daysRemaining() == 5)
+        #expect(justOutside.status() == .valid)
+        #expect(justOutside.daysRemaining() == 6)
+        #expect(expiresToday.status() == .expiringSoon)
+        #expect(expired.status() == .expired)
     }
 
     @Test("Stored effective expiry stays in sync when dates change")

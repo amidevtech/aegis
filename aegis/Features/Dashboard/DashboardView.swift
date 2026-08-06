@@ -6,7 +6,7 @@
 import SwiftData
 import SwiftUI
 
-/// Overview screen: greeting, three summary tiles, medicine list, and a panel
+/// Overview screen: subtitle, three summary tiles, medicine list, and a panel
 /// for expired medicines — layout carried over from the web template.
 struct DashboardView: View {
     @Environment(AppState.self) private var appState
@@ -95,22 +95,9 @@ struct DashboardView: View {
     // MARK: - Header
 
     private var heading: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(greeting)
-                .font(.largeTitle.bold())
-                .foregroundStyle(Theme.Palette.ink)
-            Text(L10n.Dashboard.subtitle)
-                .font(.title3)
-                .foregroundStyle(Theme.Palette.muted)
-        }
-    }
-
-    private var greeting: LocalizedStringResource {
-        switch Calendar.current.component(.hour, from: now) {
-        case 5..<12: L10n.Dashboard.greetingMorning
-        case 12..<18: L10n.Dashboard.greetingAfternoon
-        default: L10n.Dashboard.greetingEvening
-        }
+        Text(L10n.Dashboard.subtitle)
+            .font(.title3)
+            .foregroundStyle(Theme.Palette.muted)
     }
 
     // MARK: - Tiles

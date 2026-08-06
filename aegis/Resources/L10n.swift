@@ -51,18 +51,9 @@ nonisolated enum L10n {
     }
 
     enum Dashboard {
-        static let greetingMorning = LocalizedStringResource(
-            "dashboard.greeting.morning", defaultValue: "Dzień dobry",
-            comment: "Greeting shown in the morning")
-        static let greetingAfternoon = LocalizedStringResource(
-            "dashboard.greeting.afternoon", defaultValue: "Dzień dobry",
-            comment: "Greeting shown in the afternoon")
-        static let greetingEvening = LocalizedStringResource(
-            "dashboard.greeting.evening", defaultValue: "Dobry wieczór",
-            comment: "Greeting shown in the evening")
         static let subtitle = LocalizedStringResource(
             "dashboard.subtitle", defaultValue: "Sprawdź stan swojej domowej apteczki",
-            comment: "Subtitle under the greeting on the overview screen")
+            comment: "Subtitle on the overview screen")
 
         static let statActiveTitle = LocalizedStringResource(
             "dashboard.stat.active.title", defaultValue: "Aktywne leki",
@@ -80,7 +71,7 @@ nonisolated enum L10n {
             "dashboard.stat.expiring.title", defaultValue: "Wkrótce wygasają",
             comment: "Title of the tile with medicines nearing expiry")
         static let statExpiringCaption = LocalizedStringResource(
-            "dashboard.stat.expiring.caption", defaultValue: "w ciągu najbliższych 30 dni",
+            "dashboard.stat.expiring.caption", defaultValue: "w ciągu najbliższych 5 dni",
             comment: "Caption under the count of medicines nearing expiry")
 
         static let medicinesTitle = LocalizedStringResource(

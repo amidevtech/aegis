@@ -472,60 +472,6 @@
         }
       }
     },
-    "dashboard.greeting.afternoon" : {
-      "comment" : "Greeting shown in the afternoon",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Good afternoon"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dzień dobry"
-          }
-        }
-      }
-    },
-    "dashboard.greeting.evening" : {
-      "comment" : "Greeting shown in the evening",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Good evening"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dobry wieczór"
-          }
-        }
-      }
-    },
-    "dashboard.greeting.morning" : {
-      "comment" : "Greeting shown in the morning",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Good morning"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dzień dobry"
-          }
-        }
-      }
-    },
     "dashboard.medicines.see_all" : {
       "comment" : "Button that opens the full medicine list",
       "extractionState" : "manual",
@@ -605,13 +551,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "within the next 30 days"
+            "value" : "within the next 5 days"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "w ciągu najbliższych 30 dni"
+            "value" : "w ciągu najbliższych 5 dni"
           }
         }
       }
@@ -671,7 +617,7 @@
       }
     },
     "dashboard.subtitle" : {
-      "comment" : "Subtitle under the greeting on the overview screen",
+      "comment" : "Subtitle on the overview screen",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

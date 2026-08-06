@@ -12,7 +12,7 @@ nonisolated enum MedicineStatus: String, CaseIterable, Identifiable, Hashable, S
     case expired
 
     /// How many days before expiry a medicine enters the "expiring soon" section.
-    static let soonThresholdInDays = 30
+    static let soonThresholdInDays = 5
 
     var id: String { rawValue }
 
