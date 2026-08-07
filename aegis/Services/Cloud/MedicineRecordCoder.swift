@@ -119,6 +119,17 @@ enum MedicineRecordCoder {
         previous.subtracting(seen)
     }
 
+    /// Local deletes for shared departures — never when the pull was incomplete
+    /// (partial match failures must not look like real departures).
+    static func localDeletesForSharedDeparture(
+        previous: Set<UUID>,
+        seen: Set<UUID>,
+        pullIsComplete: Bool
+    ) -> Set<UUID> {
+        guard pullIsComplete else { return [] }
+        return departedSharedUUIDs(previous: previous, seen: seen)
+    }
+
     /// Tombstoned shared hits keep routing / seen membership; only skip local upsert.
     static func shouldUpsertSharedPull(isTombstoned: Bool) -> Bool {
         !isTombstoned
@@ -127,6 +138,34 @@ enum MedicineRecordCoder {
     /// Concatenate CloudKit query pages in order (cursor pagination).
     static func mergePagedResults<T>(_ pages: [[T]]) -> [T] {
         pages.flatMap { $0 }
+    }
+
+    /// One page of a CloudKit medicine query, including completeness.
+    struct MatchResultsPage: Equatable {
+        var records: [CKRecord]
+        var isComplete: Bool
+
+        static func == (lhs: MatchResultsPage, rhs: MatchResultsPage) -> Bool {
+            lhs.isComplete == rhs.isComplete
+                && lhs.records.map(\.recordID) == rhs.records.map(\.recordID)
+        }
+    }
+
+    /// Parses CloudKit match results. Any `.failure` marks the page incomplete.
+    static func parseMatchResults(
+        _ matchResults: [(CKRecord.ID, Result<CKRecord, any Error>)]
+    ) -> MatchResultsPage {
+        var records: [CKRecord] = []
+        var isComplete = true
+        for (_, result) in matchResults {
+            switch result {
+            case .success(let record):
+                records.append(record)
+            case .failure:
+                isComplete = false
+            }
+        }
+        return MatchResultsPage(records: records, isComplete: isComplete)
     }
 }
 

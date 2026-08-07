@@ -108,37 +108,37 @@ enum CloudKitOperations {
         try await database.allRecordZones()
     }
 
+    /// Fetches all medicine records in a zone. `isComplete` is false when any
+    /// per-record match result failed (callers must not treat gaps as departures).
     static func queryMedicines(
         inZone zoneID: CKRecordZone.ID,
         database: CKDatabase
-    ) async throws -> [CKRecord] {
+    ) async throws -> MedicineRecordCoder.MatchResultsPage {
         let query = CKQuery(
             recordType: MedicineRecordCoder.recordType,
             predicate: NSPredicate(value: true))
 
         var pages: [[CKRecord]] = []
+        var isComplete = true
         var cursor: CKQueryOperation.Cursor?
 
         let first = try await database.records(matching: query, inZoneWith: zoneID)
-        pages.append(Self.records(from: first.matchResults))
+        let firstPage = MedicineRecordCoder.parseMatchResults(first.matchResults)
+        pages.append(firstPage.records)
+        isComplete = isComplete && firstPage.isComplete
         cursor = first.queryCursor
 
         while let current = cursor {
             let next = try await database.records(continuingMatchFrom: current)
-            pages.append(Self.records(from: next.matchResults))
+            let page = MedicineRecordCoder.parseMatchResults(next.matchResults)
+            pages.append(page.records)
+            isComplete = isComplete && page.isComplete
             cursor = next.queryCursor
         }
 
-        return MedicineRecordCoder.mergePagedResults(pages)
-    }
-
-    private static func records(
-        from matchResults: [(CKRecord.ID, Result<CKRecord, any Error>)]
-    ) -> [CKRecord] {
-        matchResults.compactMap { _, result in
-            if case .success(let record) = result { return record }
-            return nil
-        }
+        return MedicineRecordCoder.MatchResultsPage(
+            records: MedicineRecordCoder.mergePagedResults(pages),
+            isComplete: isComplete)
     }
 
     static func fetchZoneChanges(

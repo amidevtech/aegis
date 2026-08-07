@@ -113,10 +113,37 @@ struct CloudSyncFlushTests {
         let succeeded = await sync.flushOutbox()
         #expect(succeeded == true)
         #expect(outbox.operations.isEmpty)
+        #expect(sync.lastErrorMessage == nil)
         #expect(
             CloudSyncErrorPolicy.errorMessageAfterSuccessfulSteps(
                 flushSucceeded: succeeded,
                 flushErrorMessage: sync.lastErrorMessage) == nil)
+    }
+
+    @Test("Successful flush clears a previously set lastErrorMessage")
+    func successfulFlushClearsLastErrorMessage() async {
+        let outbox = makeOutbox()
+        let uuid = UUID()
+        outbox.enqueueDelete(uuid)
+
+        var shouldFail = true
+        let sync = CloudSyncService(
+            outbox: outbox,
+            cloudDelete: { _ in
+                if shouldFail { throw FlushTestError.cloudUnavailable }
+            },
+            cloudUpsert: { _ in })
+
+        let failed = await sync.flushOutbox()
+        #expect(failed == false)
+        #expect(sync.lastErrorMessage == "cloud unavailable")
+        #expect(outbox.operations == [.delete(uuid)])
+
+        shouldFail = false
+        let succeeded = await sync.flushOutbox()
+        #expect(succeeded == true)
+        #expect(outbox.operations.isEmpty)
+        #expect(sync.lastErrorMessage == nil)
     }
 
     @Test("In-flight upsert success does not drop a newer delete")

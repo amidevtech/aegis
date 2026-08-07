@@ -135,4 +135,80 @@ struct MedicineRecordCoderTests {
         #expect(merged == [1, 2, 3, 4, 5])
         #expect(MedicineRecordCoder.mergePagedResults([[Int]]()) == [])
     }
+
+    @Test("Incomplete pull does not depart shared medicines")
+    func incompletePullDoesNotDepart() {
+        let a = UUID()
+        let b = UUID()
+        let departed = MedicineRecordCoder.localDeletesForSharedDeparture(
+            previous: [a, b],
+            seen: [a],
+            pullIsComplete: false)
+        #expect(departed.isEmpty)
+    }
+
+    @Test("Complete pull departs only missing shared UUIDs")
+    func completePullDepartsMissingOnly() {
+        let a = UUID()
+        let b = UUID()
+        let departed = MedicineRecordCoder.localDeletesForSharedDeparture(
+            previous: [a, b],
+            seen: [a],
+            pullIsComplete: true)
+        #expect(departed == [b])
+    }
+
+    @Test("Match results with a failure are incomplete")
+    func matchResultsWithFailureAreIncomplete() {
+        enum SampleError: Error { case boom }
+        let okID = CKRecord.ID(recordName: UUID().uuidString)
+        let failID = CKRecord.ID(recordName: UUID().uuidString)
+        let okRecord = CKRecord(recordType: MedicineRecordCoder.recordType, recordID: okID)
+
+        let page = MedicineRecordCoder.parseMatchResults([
+            (okID, .success(okRecord)),
+            (failID, .failure(SampleError.boom)),
+        ])
+
+        #expect(page.isComplete == false)
+        #expect(page.records.map(\.recordID) == [okID])
+    }
+
+    @Test("All-success match results are complete")
+    func allSuccessMatchResultsAreComplete() {
+        let id1 = CKRecord.ID(recordName: UUID().uuidString)
+        let id2 = CKRecord.ID(recordName: UUID().uuidString)
+        let r1 = CKRecord(recordType: MedicineRecordCoder.recordType, recordID: id1)
+        let r2 = CKRecord(recordType: MedicineRecordCoder.recordType, recordID: id2)
+
+        let page = MedicineRecordCoder.parseMatchResults([
+            (id1, .success(r1)),
+            (id2, .success(r2)),
+        ])
+
+        #expect(page.isComplete == true)
+        #expect(page.records.map(\.recordID) == [id1, id2])
+    }
+
+    @Test("Incomplete flag wins over tombstone-seen departure math")
+    func tombstonedStillSeenBlocksDepartureWhenIncomplete() {
+        let uuid = UUID()
+        var seen: Set<UUID> = []
+        seen.insert(uuid)
+        #expect(MedicineRecordCoder.shouldUpsertSharedPull(isTombstoned: true) == false)
+
+        // Even if seen omitted a prior UUID, incomplete pull must not delete.
+        let other = UUID()
+        let departed = MedicineRecordCoder.localDeletesForSharedDeparture(
+            previous: [uuid, other],
+            seen: seen,
+            pullIsComplete: false)
+        #expect(departed.isEmpty)
+
+        let complete = MedicineRecordCoder.localDeletesForSharedDeparture(
+            previous: [uuid, other],
+            seen: seen,
+            pullIsComplete: true)
+        #expect(complete == [other])
+    }
 }

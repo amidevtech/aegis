@@ -160,6 +160,63 @@ struct CloudSyncOutboxTests {
 
         #expect(outbox.operations == [.delete(uuid)])
     }
+
+    @Test("Corrupt disk data does not appear as an empty healthy queue")
+    func corruptDataDoesNotAppearAsEmptyQueue() throws {
+        let suite = "CloudSyncOutboxTests.corrupt.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        let key = "test.outbox"
+        defaults.set(Data("not-json".utf8), forKey: key)
+
+        let outbox = CloudSyncOutbox(defaults: defaults, key: key)
+        #expect(outbox.isCorrupt == true)
+        #expect(throws: CloudSyncOutbox.LoadError.corruptData) {
+            try outbox.loadOperations()
+        }
+    }
+
+    @Test("Corrupt disk does not drop a known in-memory tombstone")
+    func corruptDataDoesNotDropKnownTombstone() {
+        let suite = "CloudSyncOutboxTests.corruptKeep.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        let key = "test.outbox"
+        let outbox = CloudSyncOutbox(defaults: defaults, key: key)
+
+        let uuid = UUID()
+        #expect(outbox.enqueueDelete(uuid) == true)
+        #expect(outbox.pendingDeleteUUIDs == [uuid])
+
+        // Simulate disk corruption after a successful enqueue.
+        defaults.set(Data("{{{{".utf8), forKey: key)
+
+        // Last-good memory still exposes the tombstone for resurrection blocking.
+        #expect(outbox.pendingDeleteUUIDs == [uuid])
+        #expect(outbox.isCorrupt == true)
+        #expect(throws: CloudSyncOutbox.LoadError.corruptData) {
+            try outbox.loadOperations()
+        }
+    }
+
+    @Test("Save failure is observable and leaves disk unchanged")
+    func saveFailureIsObservable() {
+        let suite = "CloudSyncOutboxTests.encodeFail.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        let key = "test.outbox"
+
+        enum EncodeBoom: Error { case fail }
+        let outbox = CloudSyncOutbox(
+            defaults: defaults,
+            key: key,
+            encoder: { _ in throw EncodeBoom.fail })
+
+        let uuid = UUID()
+        #expect(outbox.enqueueDelete(uuid) == false)
+        #expect(defaults.data(forKey: key) == nil)
+        #expect(outbox.operations.isEmpty)
+    }
 }
 
 @MainActor

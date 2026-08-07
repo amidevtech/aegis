@@ -186,11 +186,15 @@ final class CloudSyncService {
             // skips stale local copies) before any outbox flush / bootstrap push.
             try await pullSharedMedicines()
             try await pullChanges()
-            let flushSucceeded = await flushOutbox()
+            let midFlushSucceeded = await flushOutbox()
             try await pushAllLocalMedicines()
             try await pullSharedMedicines()
             share = try await fetchExistingShare()
+            // Mark running before the terminal flush so enqueue during start can
+            // also schedule; terminal flush drains ops enqueued while isRunning was false.
             isRunning = true
+            let terminalFlushSucceeded = await flushOutbox()
+            let flushSucceeded = midFlushSucceeded && terminalFlushSucceeded
             lastErrorMessage = CloudSyncErrorPolicy.errorMessageAfterSuccessfulSteps(
                 flushSucceeded: flushSucceeded,
                 flushErrorMessage: lastErrorMessage)
@@ -198,6 +202,14 @@ final class CloudSyncService {
             lastErrorMessage = error.localizedDescription
             isRunning = false
         }
+    }
+
+    /// Test hook: enqueue work while `isRunning` is false, then flip running and
+    /// flush — mirrors the start-window terminal flush without CloudKit.
+    func simulateStartWindow(beforeRunning: () async -> Void) async {
+        await beforeRunning()
+        isRunning = true
+        _ = await flushOutbox()
     }
 
     private func performStop() {
@@ -293,6 +305,7 @@ final class CloudSyncService {
             lastErrorMessage = firstError.localizedDescription
             return false
         }
+        lastErrorMessage = nil
         return true
     }
 
@@ -442,13 +455,15 @@ final class CloudSyncService {
         let previousShared = Set(sharedRecordIDs.keys)
         let zones = try await CloudKitOperations.allRecordZones(in: sharedDatabase)
         var seenSharedUUIDs: Set<UUID> = []
+        var pullIsComplete = true
         let tombstones = outbox.pendingDeleteUUIDs
 
         for zone in zones {
-            let records = try await CloudKitOperations.queryMedicines(
+            let page = try await CloudKitOperations.queryMedicines(
                 inZone: zone.zoneID,
                 database: sharedDatabase)
-            for record in records {
+            pullIsComplete = pullIsComplete && page.isComplete
+            for record in page.records {
                 guard let snapshot = MedicineRecordCoder.snapshot(from: record) else { continue }
                 // Always keep routing + seen membership for tombstones so flush
                 // deletes the shared record (not the private zone fallback).
@@ -461,10 +476,12 @@ final class CloudSyncService {
             }
         }
 
-        // Successful pull completed — mirror departures by deleting local copies.
-        let departed = MedicineRecordCoder.departedSharedUUIDs(
+        // Only mirror departures after a complete pull — partial match failures
+        // must not look like medicines that left the shared cabinet.
+        let departed = MedicineRecordCoder.localDeletesForSharedDeparture(
             previous: previousShared,
-            seen: seenSharedUUIDs)
+            seen: seenSharedUUIDs,
+            pullIsComplete: pullIsComplete)
         for uuid in departed {
             sharedRecordIDs[uuid] = nil
             try localStore.deleteByUUID(uuid)
