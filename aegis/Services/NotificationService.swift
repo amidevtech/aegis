@@ -11,6 +11,7 @@ import UserNotifications
 /// Bodies are stored as keys, not finished copy — the system localizes them
 /// at delivery time, so a notification scheduled six months ago appears
 /// in whichever language is set today.
+@MainActor
 @Observable
 final class NotificationService {
     static let shared = NotificationService()
@@ -21,9 +22,16 @@ final class NotificationService {
     /// Notification hour — morning, so there is time to react during the day.
     private static let notificationHour = 9
 
+    private static let includeNameKey = "notifications.includeMedicineName"
+
     private let center = UNUserNotificationCenter.current()
 
     private init() {}
+
+    /// When false (default), lock-screen bodies omit medicine names.
+    private var includeMedicineName: Bool {
+        UserDefaults.standard.bool(forKey: Self.includeNameKey)
+    }
 
     // MARK: - Permission
 
@@ -51,7 +59,7 @@ final class NotificationService {
         await refreshAuthorizationStatus()
         switch authorizationStatus {
         case .notDetermined:
-            let granted = (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
             await refreshAuthorizationStatus()
             return granted
         default:
@@ -70,9 +78,15 @@ final class NotificationService {
         guard isAuthorized else { return }
 
         center.removeAllPendingNotificationRequests()
+        // Clear stale badge counts from prior schedules.
+        try? await center.setBadgeCount(0)
 
-        for medicine in medicines where !medicine.isArchived {
-            for request in requests(for: medicine) {
+        let payloads = medicines
+            .filter { !$0.isArchived }
+            .map(NotificationPayload.init(medicine:))
+
+        for payload in payloads {
+            for request in requests(for: payload) {
                 try? await center.add(request)
             }
         }
@@ -80,30 +94,49 @@ final class NotificationService {
 
     /// Reschedules reminders for one medicine after an edit or package opening.
     func reschedule(for medicine: Medicine) async {
-        cancel(for: medicine)
-        guard !medicine.isArchived, await requestAuthorizationIfNeeded() else { return }
-        for request in requests(for: medicine) {
+        let payload = NotificationPayload(medicine: medicine)
+        cancel(uuid: payload.uuid)
+        guard !payload.isArchived, await requestAuthorizationIfNeeded() else { return }
+        for request in requests(for: payload) {
             try? await center.add(request)
         }
     }
 
     func cancel(for medicine: Medicine) {
+        cancel(uuid: medicine.uuid)
+    }
+
+    private func cancel(uuid: UUID) {
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
             return
         }
         center.removePendingNotificationRequests(
-            withIdentifiers: Self.leadTimesInDays.map { identifier(for: medicine, leadDays: $0) })
+            withIdentifiers: Self.leadTimesInDays.map { identifier(for: uuid, leadDays: $0) })
     }
 
     // MARK: - Details
 
-    private func identifier(for medicine: Medicine, leadDays: Int) -> String {
-        "\(medicine.uuid.uuidString)-\(leadDays)"
+    private struct NotificationPayload {
+        let uuid: UUID
+        let name: String
+        let effectiveExpiryDate: Date
+        let isArchived: Bool
+
+        init(medicine: Medicine) {
+            uuid = medicine.uuid
+            name = medicine.name
+            effectiveExpiryDate = medicine.effectiveExpiryDate
+            isArchived = medicine.isArchived
+        }
     }
 
-    private func requests(for medicine: Medicine) -> [UNNotificationRequest] {
+    private func identifier(for uuid: UUID, leadDays: Int) -> String {
+        "\(uuid.uuidString)-\(leadDays)"
+    }
+
+    private func requests(for payload: NotificationPayload) -> [UNNotificationRequest] {
         let calendar = Calendar.current
-        let expiry = calendar.startOfDay(for: medicine.effectiveExpiryDate)
+        let expiry = calendar.startOfDay(for: payload.effectiveExpiryDate)
         guard expiry < .distantFuture else { return [] }
 
         return Self.leadTimesInDays.compactMap { leadDays in
@@ -120,24 +153,34 @@ final class NotificationService {
                 forKey: leadDays == 0 ? L10n.NotificationKey.expiredTitle
                                       : L10n.NotificationKey.expiringTitle,
                 arguments: nil)
-            content.body = NSString.localizedUserNotificationString(
-                forKey: bodyKey(leadDays: leadDays),
-                arguments: [medicine.name])
+
+            if includeMedicineName {
+                content.body = NSString.localizedUserNotificationString(
+                    forKey: bodyKey(leadDays: leadDays, private: false),
+                    arguments: [payload.name])
+            } else {
+                content.body = NSString.localizedUserNotificationString(
+                    forKey: bodyKey(leadDays: leadDays, private: true),
+                    arguments: nil)
+            }
             content.sound = .default
             content.interruptionLevel = leadDays == 0 ? .timeSensitive : .active
 
             return UNNotificationRequest(
-                identifier: identifier(for: medicine, leadDays: leadDays),
+                identifier: identifier(for: payload.uuid, leadDays: leadDays),
                 content: content,
                 trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false))
         }
     }
 
-    private func bodyKey(leadDays: Int) -> String {
-        switch leadDays {
-        case 30: L10n.NotificationKey.bodyIn30Days
-        case 7: L10n.NotificationKey.bodyIn7Days
-        default: L10n.NotificationKey.bodyToday
+    private func bodyKey(leadDays: Int, private isPrivate: Bool) -> String {
+        switch (leadDays, isPrivate) {
+        case (30, false): L10n.NotificationKey.bodyIn30Days
+        case (7, false): L10n.NotificationKey.bodyIn7Days
+        case (_, false): L10n.NotificationKey.bodyToday
+        case (30, true): L10n.NotificationKey.bodyIn30DaysPrivate
+        case (7, true): L10n.NotificationKey.bodyIn7DaysPrivate
+        case (_, true): L10n.NotificationKey.bodyTodayPrivate
         }
     }
 

@@ -16,11 +16,16 @@ final class CloudSyncService {
     private(set) var iCloudAccountStatus: CKAccountStatus = .couldNotDetermine
     private(set) var share: CKShare?
 
+    static let containerIdentifier = "iCloud.com.amidev.aegis"
+
     private let containerIdentifier: String
     private var container: CKContainer { CKContainer(identifier: containerIdentifier) }
     private var privateDatabase: CKDatabase { container.privateCloudDatabase }
     private var sharedDatabase: CKDatabase { container.sharedCloudDatabase }
     private weak var localStore: LocalStore?
+
+    /// Medicines that live in a shared zone (participant write-back target).
+    private var sharedRecordIDs: [UUID: CKRecord.ID] = [:]
 
     private var changeToken: CKServerChangeToken? {
         get {
@@ -41,7 +46,6 @@ final class CloudSyncService {
     }
 
     private static let tokenKey = "cloudSync.cabinetZoneChangeToken"
-    private static let containerIdentifier = "iCloud.com.amidev.aegis"
 
     init(containerIdentifier: String = CloudSyncService.containerIdentifier) {
         self.containerIdentifier = containerIdentifier
@@ -51,9 +55,13 @@ final class CloudSyncService {
         iCloudAccountStatus == .available
     }
 
+    func clearError() {
+        lastErrorMessage = nil
+    }
+
     func refreshAccountStatus() async {
         do {
-            iCloudAccountStatus = try await container.accountStatus()
+            iCloudAccountStatus = try await CloudKitOperations.accountStatus(for: container)
         } catch {
             iCloudAccountStatus = .couldNotDetermine
             lastErrorMessage = error.localizedDescription
@@ -71,6 +79,9 @@ final class CloudSyncService {
 
         do {
             try await ensureZoneAndCabinet()
+            // Populate shared-zone routing before push so participant edits
+            // do not land in the private database.
+            try await pullSharedMedicines()
             try await pushAllLocalMedicines()
             try await pullChanges()
             try await pullSharedMedicines()
@@ -86,13 +97,17 @@ final class CloudSyncService {
     func stop() async {
         isRunning = false
         share = nil
+        sharedRecordIDs = [:]
     }
 
     func upsert(_ snapshot: MedicineCloudSnapshot) async {
         guard isRunning else { return }
         do {
-            let record = MedicineRecordCoder.makeRecord(from: snapshot)
-            _ = try await privateDatabase.save(record)
+            let target = databaseAndZone(for: snapshot.uuid)
+            try await CloudKitOperations.upsertMedicineRecords(
+                [snapshot],
+                zoneID: target.zoneID,
+                database: target.database)
             lastErrorMessage = nil
         } catch {
             lastErrorMessage = error.localizedDescription
@@ -102,10 +117,12 @@ final class CloudSyncService {
     func deleteMedicine(uuid: UUID) async {
         guard isRunning else { return }
         do {
-            try await privateDatabase.deleteRecord(withID: MedicineRecordCoder.recordID(for: uuid))
+            let target = databaseAndZone(for: uuid)
+            let recordID = sharedRecordIDs[uuid]
+                ?? MedicineRecordCoder.recordID(for: uuid, zoneID: target.zoneID)
+            try await CloudKitOperations.deleteRecord(id: recordID, from: target.database)
+            sharedRecordIDs[uuid] = nil
             lastErrorMessage = nil
-        } catch let error as CKError where error.code == .unknownItem {
-            // Already deleted in the cloud.
         } catch {
             lastErrorMessage = error.localizedDescription
         }
@@ -132,43 +149,60 @@ final class CloudSyncService {
         }
 
         let cabinetID = MedicineRecordCoder.cabinetRecordID()
-        let cabinet = try await privateDatabase.record(for: cabinetID)
+        let cabinet = try await CloudKitOperations.fetchRecord(id: cabinetID, from: privateDatabase)
         let newShare = CKShare(rootRecord: cabinet)
         newShare[CKShare.SystemFieldKey.title] = String(localized: "settings.share.title")
         newShare.publicPermission = .none
 
-        _ = try await privateDatabase.modifyRecords(
+        try await CloudKitOperations.modifyRecords(
             saving: [cabinet, newShare],
-            deleting: [])
+            in: privateDatabase)
 
         share = newShare
         return newShare
     }
 
     func acceptShare(metadata: CKShare.Metadata) async throws {
-        try await container.accept(metadata)
-        try await pullSharedMedicines()
-        isRunning = true
+        do {
+            guard localStore != nil else {
+                throw CloudSyncError.storeUnavailable
+            }
+            try await CloudKitOperations.accept(metadata, on: container)
+            try await pullSharedMedicines()
+            isRunning = true
+            lastErrorMessage = nil
+        } catch {
+            lastErrorMessage = error.localizedDescription
+            throw error
+        }
+    }
+
+    // MARK: - Routing
+
+    private struct DatabaseTarget {
+        let database: CKDatabase
+        let zoneID: CKRecordZone.ID
+    }
+
+    private func databaseAndZone(for uuid: UUID) -> DatabaseTarget {
+        if let sharedID = sharedRecordIDs[uuid] {
+            return DatabaseTarget(database: sharedDatabase, zoneID: sharedID.zoneID)
+        }
+        return DatabaseTarget(database: privateDatabase, zoneID: MedicineRecordCoder.zoneID)
     }
 
     // MARK: - Private helpers
 
     private func ensureZoneAndCabinet() async throws {
         let zone = CKRecordZone(zoneID: MedicineRecordCoder.zoneID)
-        do {
-            _ = try await privateDatabase.save(zone)
-        } catch let error as CKError where error.code == .serverRecordChanged {
-            // Zone already exists.
-        } catch let error as CKError where error.code == .partialFailure {
-            // Partial success when the zone already exists — continue.
-        }
+        try await CloudKitOperations.saveZone(zone, to: privateDatabase)
 
         let cabinetID = MedicineRecordCoder.cabinetRecordID()
         do {
-            _ = try await privateDatabase.record(for: cabinetID)
+            _ = try await CloudKitOperations.fetchRecord(id: cabinetID, from: privateDatabase)
         } catch {
             let cabinet = MedicineRecordCoder.makeCabinetRecord()
-            _ = try await privateDatabase.save(cabinet)
+            _ = try await CloudKitOperations.saveRecord(cabinet, to: privateDatabase)
         }
     }
 
@@ -177,13 +211,28 @@ final class CloudSyncService {
         let medicines = try localStore.fetchAll()
         guard !medicines.isEmpty else { return }
 
-        let records = medicines.map {
-            MedicineRecordCoder.makeRecord(from: MedicineCloudSnapshot(from: $0))
+        var privateSnapshots: [MedicineCloudSnapshot] = []
+        var sharedByZone: [CKRecordZone.ID: [MedicineCloudSnapshot]] = [:]
+
+        for medicine in medicines {
+            let snapshot = MedicineCloudSnapshot(from: medicine)
+            if let sharedID = sharedRecordIDs[medicine.uuid] {
+                sharedByZone[sharedID.zoneID, default: []].append(snapshot)
+            } else {
+                privateSnapshots.append(snapshot)
+            }
         }
 
-        // Chunk writes so we stay under the CloudKit limit.
-        for chunk in records.chunked(into: 200) {
-            _ = try await privateDatabase.modifyRecords(saving: chunk, deleting: [])
+        try await CloudKitOperations.upsertMedicineRecords(
+            privateSnapshots,
+            zoneID: MedicineRecordCoder.zoneID,
+            database: privateDatabase)
+
+        for (zoneID, snapshots) in sharedByZone {
+            try await CloudKitOperations.upsertMedicineRecords(
+                snapshots,
+                zoneID: zoneID,
+                database: sharedDatabase)
         }
     }
 
@@ -195,10 +244,10 @@ final class CloudSyncService {
         var moreComing = true
 
         while moreComing {
-            let config = CKFetchRecordZoneChangesOperation.ZoneConfiguration()
-            config.previousServerChangeToken = pendingToken
-
-            let changes = try await fetchZoneChanges(zoneID: zoneID, configuration: config)
+            let changes = try await CloudKitOperations.fetchZoneChanges(
+                zoneID: zoneID,
+                previousToken: pendingToken,
+                database: privateDatabase)
             for record in changes.modifications {
                 if let snapshot = MedicineRecordCoder.snapshot(from: record) {
                     try localStore.upsertFromCloud(snapshot)
@@ -206,6 +255,7 @@ final class CloudSyncService {
             }
             for recordID in changes.deletions {
                 if let uuid = UUID(uuidString: recordID.recordName) {
+                    sharedRecordIDs[uuid] = nil
                     try localStore.deleteByUUID(uuid)
                 }
             }
@@ -219,89 +269,43 @@ final class CloudSyncService {
     private func pullSharedMedicines() async throws {
         guard let localStore else { return }
 
-        let zones = try await sharedDatabase.allRecordZones()
+        let zones = try await CloudKitOperations.allRecordZones(in: sharedDatabase)
+        var seenSharedUUIDs: Set<UUID> = []
+
         for zone in zones {
-            let query = CKQuery(
-                recordType: MedicineRecordCoder.recordType,
-                predicate: NSPredicate(value: true))
-            let (results, _) = try await sharedDatabase.records(
-                matching: query,
-                inZoneWith: zone.zoneID)
-            for (_, result) in results {
-                if case .success(let record) = result,
-                   let snapshot = MedicineRecordCoder.snapshot(from: record)
-                {
-                    try localStore.upsertFromCloud(snapshot)
-                }
+            let records = try await CloudKitOperations.queryMedicines(
+                inZone: zone.zoneID,
+                database: sharedDatabase)
+            for record in records {
+                guard let snapshot = MedicineRecordCoder.snapshot(from: record) else { continue }
+                sharedRecordIDs[snapshot.uuid] = record.recordID
+                seenSharedUUIDs.insert(snapshot.uuid)
+                try localStore.upsertFromCloud(snapshot)
             }
+        }
+
+        // Clear stale routing so local edits to departed shared items go to the private DB.
+        for uuid in Array(sharedRecordIDs.keys) where !seenSharedUUIDs.contains(uuid) {
+            sharedRecordIDs[uuid] = nil
         }
     }
 
     private func fetchExistingShare() async throws -> CKShare? {
         let cabinetID = MedicineRecordCoder.cabinetRecordID()
-        let cabinet = try await privateDatabase.record(for: cabinetID)
+        let cabinet = try await CloudKitOperations.fetchRecord(id: cabinetID, from: privateDatabase)
         guard let shareReference = cabinet.share else { return nil }
-        return try await privateDatabase.record(for: shareReference.recordID) as? CKShare
-    }
-
-    private struct ZoneChanges {
-        var modifications: [CKRecord] = []
-        var deletions: [CKRecord.ID] = []
-        var token: CKServerChangeToken?
-        var moreComing = false
-    }
-
-    private func fetchZoneChanges(
-        zoneID: CKRecordZone.ID,
-        configuration: CKFetchRecordZoneChangesOperation.ZoneConfiguration
-    ) async throws -> ZoneChanges {
-        try await withCheckedThrowingContinuation { continuation in
-            var result = ZoneChanges()
-            let operation = CKFetchRecordZoneChangesOperation(
-                recordZoneIDs: [zoneID],
-                configurationsByRecordZoneID: [zoneID: configuration])
-
-            operation.recordWasChangedBlock = { _, recordResult in
-                if case .success(let record) = recordResult {
-                    result.modifications.append(record)
-                }
-            }
-            operation.recordWithIDWasDeletedBlock = { recordID, _ in
-                result.deletions.append(recordID)
-            }
-            operation.recordZoneChangeTokensUpdatedBlock = { _, token, _ in
-                result.token = token
-            }
-            operation.recordZoneFetchResultBlock = { _, zoneResult in
-                if case .success(let success) = zoneResult {
-                    result.token = success.serverChangeToken
-                    result.moreComing = success.moreComing
-                }
-            }
-            operation.fetchRecordZoneChangesResultBlock = { opResult in
-                switch opResult {
-                case .success:
-                    continuation.resume(returning: result)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-
-            privateDatabase.add(operation)
-        }
+        return try await CloudKitOperations.fetchRecord(
+            id: shareReference.recordID, from: privateDatabase) as? CKShare
     }
 }
 
-private extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        guard size > 0 else { return [self] }
-        var chunks: [[Element]] = []
-        var index = startIndex
-        while index < endIndex {
-            let next = self.index(index, offsetBy: size, limitedBy: endIndex) ?? endIndex
-            chunks.append(Array(self[index..<next]))
-            index = next
+enum CloudSyncError: LocalizedError {
+    case storeUnavailable
+
+    var errorDescription: String? {
+        switch self {
+        case .storeUnavailable:
+            String(localized: "settings.sync.store_unavailable")
         }
-        return chunks
     }
 }

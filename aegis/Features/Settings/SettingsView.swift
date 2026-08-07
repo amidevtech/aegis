@@ -25,13 +25,15 @@ struct SettingsView: View {
     @State private var isPreparingShare = false
     @State private var shareErrorMessage: String?
     @State private var isPresentingPaywall = false
+    @AppStorage("notifications.includeMedicineName") private var includeMedicineNameInNotifications = false
 
-    private let cloudContainer = CKContainer(identifier: "iCloud.com.amidev.aegis")
+    private let cloudContainer = CKContainer(identifier: CloudSyncService.containerIdentifier)
 
     var body: some View {
         NavigationStack {
             Form {
                 subscriptionSection
+                notificationsSection
                 if subscriptionStore.isPro {
                     syncSection
                     sharingSection
@@ -61,7 +63,10 @@ struct SettingsView: View {
             #if canImport(UIKit) && !os(watchOS)
             .sheet(isPresented: $isPresentingShare) {
                 if let activeShare {
-                    CloudSharingViewRepresentable(share: activeShare, container: cloudContainer)
+                    CloudSharingViewRepresentable(
+                        share: activeShare,
+                        container: cloudContainer,
+                        onError: { shareErrorMessage = $0.localizedDescription })
                 }
             }
             #endif
@@ -92,6 +97,31 @@ struct SettingsView: View {
             Button(L10n.Paywall.restore) {
                 Task { await subscriptionStore.restore() }
             }
+
+            if let message = subscriptionStore.lastErrorMessage {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(Theme.Palette.danger)
+            }
+        }
+    }
+
+    private var notificationsSection: some View {
+        Section {
+            Toggle(isOn: $includeMedicineNameInNotifications) {
+                Text(L10n.Settings.notificationIncludeName)
+            }
+            .onChange(of: includeMedicineNameInNotifications) { _, _ in
+                Task {
+                    let medicines = (try? repository.fetchActiveMedicines()) ?? []
+                    await NotificationService.shared.sync(medicines: medicines)
+                }
+            }
+            Text(L10n.Settings.notificationIncludeNameFootnote)
+                .font(.footnote)
+                .foregroundStyle(Theme.Palette.muted)
+        } header: {
+            Text(L10n.Settings.notificationsSection)
         }
     }
 
@@ -115,7 +145,10 @@ struct SettingsView: View {
             }
             .disabled(!cloudSync.isRunning)
 
-            if let message = cloudSync.lastErrorMessage ?? shareErrorMessage {
+            if let message = cloudSync.lastErrorMessage
+                ?? repository.lastErrorMessage
+                ?? shareErrorMessage
+            {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(Theme.Palette.danger)
@@ -127,6 +160,7 @@ struct SettingsView: View {
 
     private var sharingSection: some View {
         Section {
+            #if canImport(UIKit) && !os(watchOS)
             Button {
                 Task { await presentShare() }
             } label: {
@@ -141,6 +175,11 @@ struct SettingsView: View {
             Text(L10n.Settings.shareFootnote)
                 .font(.footnote)
                 .foregroundStyle(Theme.Palette.muted)
+            #else
+            Text(L10n.Settings.shareMacUnavailable)
+                .font(.footnote)
+                .foregroundStyle(Theme.Palette.muted)
+            #endif
         } header: {
             Text(L10n.Settings.sharingSection)
         }

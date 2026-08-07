@@ -23,10 +23,26 @@ struct RootView: View {
 
     @State private var isPresentingExpiredAlert = false
     @State private var hasEvaluatedOnLaunch = false
+    @State private var dismissedErrorMessage: String?
 
     private var expiredMedicines: [Medicine] {
         let now = Date.now
         return activeMedicines.filter { $0.status(now: now) == .expired }
+    }
+
+    private var activeErrorMessage: String? {
+        if let message = repository.lastErrorMessage, !message.isEmpty {
+            return message
+        }
+        if let message = cloudSync.lastErrorMessage, !message.isEmpty {
+            return message
+        }
+        return nil
+    }
+
+    private var visibleErrorMessage: String? {
+        guard let message = activeErrorMessage, message != dismissedErrorMessage else { return nil }
+        return message
     }
 
     var body: some View {
@@ -55,6 +71,11 @@ struct RootView: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         .tint(Theme.Palette.brand)
+        .safeAreaInset(edge: .bottom) {
+            if let message = visibleErrorMessage {
+                errorBanner(message)
+            }
+        }
         .sheet(isPresented: $appState.isPresentingNewMedicine) {
             MedicineFormView(mode: .create)
         }
@@ -71,6 +92,7 @@ struct RootView: View {
             guard !hasEvaluatedOnLaunch else { return }
             hasEvaluatedOnLaunch = true
             evaluateExpiredAlert(isColdLaunch: true)
+            _ = await NotificationService.shared.requestAuthorizationIfNeeded()
             await NotificationService.shared.sync(medicines: activeMedicines)
         }
         .onChange(of: scenePhase) { _, phase in
@@ -92,6 +114,40 @@ struct RootView: View {
                 appState.selectedTab = .overview
             }
         }
+        .onChange(of: activeErrorMessage) { _, newValue in
+            if newValue == nil {
+                dismissedErrorMessage = nil
+            }
+        }
+    }
+
+    private func errorBanner(_ message: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Theme.Palette.danger)
+                .accessibilityHidden(true)
+
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(Theme.Palette.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                dismissedErrorMessage = message
+                repository.clearError()
+                cloudSync.clearError()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(Theme.Palette.muted)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(L10n.Common.done))
+        }
+        .padding(12)
+        .background(Theme.softBackground(Theme.Palette.danger), in: .rect(cornerRadius: 12))
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .accessibilityElement(children: .combine)
     }
 
     /// The sheet appears on cold launch and on the first open of the day.

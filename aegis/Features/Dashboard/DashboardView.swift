@@ -12,13 +12,14 @@ struct DashboardView: View {
     @Environment(AppState.self) private var appState
     @Environment(MedicineRepository.self) private var repository
     @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(\.scenePhase) private var scenePhase
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var medicines: [Medicine]
 
     @State private var medicinesPendingDeletion: [Medicine] = []
+    @State private var now = Date.now
 
-    private let now = Date.now
     private static let previewRowLimit = 5
 
     private var openedCount: Int {
@@ -82,6 +83,9 @@ struct DashboardView: View {
                 }
             } message: {
                 Text(L10n.Medicines.deleteConfirmMessage)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { now = .now }
             }
         }
     }

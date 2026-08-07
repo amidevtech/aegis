@@ -51,7 +51,10 @@ struct LocalizationTests {
         L10n.NotificationKey.expiredTitle,
         L10n.NotificationKey.bodyIn30Days,
         L10n.NotificationKey.bodyIn7Days,
-        L10n.NotificationKey.bodyToday
+        L10n.NotificationKey.bodyToday,
+        L10n.NotificationKey.bodyIn30DaysPrivate,
+        L10n.NotificationKey.bodyIn7DaysPrivate,
+        L10n.NotificationKey.bodyTodayPrivate
     ]
 
     private func bundle(for language: String) throws -> Bundle {

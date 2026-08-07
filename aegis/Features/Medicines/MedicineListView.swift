@@ -27,6 +27,7 @@ struct MedicineListView: View {
     @Environment(AppState.self) private var appState
     @Environment(MedicineRepository.self) private var repository
     @Environment(SubscriptionStore.self) private var subscriptionStore
+    @Environment(\.scenePhase) private var scenePhase
 
     @Query(filter: MedicineQueries.active, sort: MedicineQueries.byExpiry)
     private var medicines: [Medicine]
@@ -36,8 +37,7 @@ struct MedicineListView: View {
     @State private var sort: MedicineSort = .expiry
     @State private var medicinePendingDeletion: Medicine?
     @FocusState private var isSearchFocused: Bool
-
-    private let now = Date.now
+    @State private var now = Date.now
 
     var body: some View {
         @Bindable var appState = appState
@@ -64,10 +64,7 @@ struct MedicineListView: View {
                     appState.isSearchFocusRequested = false
                 }
                 .confirmationDialog(
-                    Text(
-                        subscriptionStore.isPro
-                            ? L10n.Archive.deleteConfirmTitle
-                            : L10n.Medicines.deleteConfirmTitle),
+                    Text(L10n.Medicines.deleteConfirmTitle),
                     isPresented: deletionDialogBinding,
                     titleVisibility: .visible,
                     presenting: medicinePendingDeletion
@@ -80,10 +77,10 @@ struct MedicineListView: View {
                         medicinePendingDeletion = nil
                     }
                 } message: { _ in
-                    Text(
-                        subscriptionStore.isPro
-                            ? L10n.Archive.deleteConfirmMessage
-                            : L10n.Medicines.deleteConfirmMessage)
+                    Text(L10n.Medicines.deleteConfirmMessage)
+                }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { now = .now }
                 }
         }
     }
@@ -137,11 +134,6 @@ struct MedicineListView: View {
                             MedicineRow(medicine: medicine, now: now)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                medicinePendingDeletion = medicine
-                            } label: {
-                                Label(L10n.Common.delete, systemImage: "trash.fill")
-                            }
                             if subscriptionStore.isPro {
                                 Button(role: .destructive) {
                                     let result = MedicineActions.archive(
@@ -153,6 +145,13 @@ struct MedicineListView: View {
                                     }
                                 } label: {
                                     Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                                }
+                                .accessibilityHint(Text(L10n.Expired.footnote))
+                            } else {
+                                Button(role: .destructive) {
+                                    medicinePendingDeletion = medicine
+                                } label: {
+                                    Label(L10n.Common.delete, systemImage: "trash.fill")
                                 }
                             }
                         }

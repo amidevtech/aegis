@@ -97,7 +97,7 @@ enum MedicineRecordCoder {
         let record = CKRecord(
             recordType: cabinetRecordType,
             recordID: cabinetRecordID(zoneID: zoneID))
-        record["title"] = "Home Cabinet" as CKRecordValue
+        record["title"] = String(localized: "settings.share.title") as CKRecordValue
         record["modifiedAt"] = Date.now as CKRecordValue
         return record
     }

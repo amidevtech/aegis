@@ -500,6 +500,25 @@ nonisolated enum L10n {
             "settings.share.footnote",
             defaultValue: "Invited family members will see the same medicines on their devices.",
             comment: "Explains sharing the medicine cabinet")
+        static let shareMacUnavailable = LocalizedStringResource(
+            "settings.share.mac_unavailable",
+            defaultValue: "Family sharing setup is available on iPhone and iPad. You can still accept invitations on Mac.",
+            comment: "Explains that CKShare UI is not available on Mac")
+        static let syncStoreUnavailable = LocalizedStringResource(
+            "settings.sync.store_unavailable",
+            defaultValue: "The local medicine cabinet is not ready yet. Open the app and try again.",
+            comment: "Error when accepting a share before the local store is wired")
+        static let notificationsSection = LocalizedStringResource(
+            "settings.notifications", defaultValue: "Notifications",
+            comment: "Expiry reminder settings section")
+        static let notificationIncludeName = LocalizedStringResource(
+            "settings.notification.include_name",
+            defaultValue: "Show medicine names on lock screen",
+            comment: "Toggle for including medicine names in notification bodies")
+        static let notificationIncludeNameFootnote = LocalizedStringResource(
+            "settings.notification.include_name.footnote",
+            defaultValue: "Off by default so expiry reminders stay private on the lock screen.",
+            comment: "Explains why medicine names are redacted by default")
     }
 
     /// Notification keys are resolved only at delivery time
@@ -510,5 +529,8 @@ nonisolated enum L10n {
         static let bodyIn30Days = "notification.body.in_30_days"
         static let bodyIn7Days = "notification.body.in_7_days"
         static let bodyToday = "notification.body.today"
+        static let bodyIn30DaysPrivate = "notification.body.in_30_days.private"
+        static let bodyIn7DaysPrivate = "notification.body.in_7_days.private"
+        static let bodyTodayPrivate = "notification.body.today.private"
     }
 }

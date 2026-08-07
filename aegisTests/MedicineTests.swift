@@ -257,4 +257,24 @@ struct MedicineTests {
         #expect(suggestions.count == 1)
         #expect(suggestions.first?.field == .person)
     }
+
+    @Test("Expiring-soon filter excludes expired medicines")
+    func expiringSoonFilterExcludesExpired() throws {
+        let calendar = Calendar.current
+        let soonDate = try #require(calendar.date(byAdding: .day, value: 3, to: .now))
+        let expiredDate = try #require(calendar.date(byAdding: .day, value: -2, to: .now))
+        let validDate = try #require(calendar.date(byAdding: .day, value: 60, to: .now))
+
+        let soon = Medicine(expiryDate: soonDate)
+        soon.refreshEffectiveExpiry()
+        let expired = Medicine(expiryDate: expiredDate)
+        expired.refreshEffectiveExpiry()
+        let valid = Medicine(expiryDate: validDate)
+        valid.refreshEffectiveExpiry()
+
+        let now = Date.now
+        #expect(MedicineListFilter.expiringSoon.matches(soon, now: now))
+        #expect(!MedicineListFilter.expiringSoon.matches(expired, now: now))
+        #expect(!MedicineListFilter.expiringSoon.matches(valid, now: now))
+    }
 }

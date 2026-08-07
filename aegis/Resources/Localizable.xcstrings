@@ -2092,6 +2092,60 @@
         }
       }
     },
+    "notification.body.in_7_days.private" : {
+      "comment" : "Private reminder body 7 days before expiry without medicine name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medicine in your cabinet expires in 7 days"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lek w apteczce traci ważność za 7 dni"
+          }
+        }
+      }
+    },
+    "notification.body.in_30_days.private" : {
+      "comment" : "Private reminder body 30 days before expiry without medicine name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medicine in your cabinet expires in 30 days"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lek w apteczce traci ważność za 30 dni"
+          }
+        }
+      }
+    },
+    "notification.body.today.private" : {
+      "comment" : "Private reminder body on the expiry day without medicine name",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A medicine in your cabinet expires today"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lek w apteczce traci ważność dzisiaj"
+          }
+        }
+      }
+    },
     "notification.expired.title" : {
       "comment" : "Notification title on the expiry day",
       "extractionState" : "manual",
@@ -2452,6 +2506,60 @@
         }
       }
     },
+    "settings.notification.include_name" : {
+      "comment" : "Toggle for including medicine names in notification bodies",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show medicine names on lock screen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokazuj nazwy leków na ekranie blokady"
+          }
+        }
+      }
+    },
+    "settings.notification.include_name.footnote" : {
+      "comment" : "Explains why medicine names are redacted by default",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off by default so expiry reminders stay private on the lock screen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domyślnie wyłączone, aby przypomnienia na ekranie blokady pozostały prywatne."
+          }
+        }
+      }
+    },
+    "settings.notifications" : {
+      "comment" : "Expiry reminder settings section",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia"
+          }
+        }
+      }
+    },
     "settings.share" : {
       "comment" : "Button that opens CKShare",
       "extractionState" : "manual",
@@ -2484,6 +2592,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zaproszeni członkowie rodziny zobaczą te same leki na swoich urządzeniach."
+          }
+        }
+      }
+    },
+    "settings.share.mac_unavailable" : {
+      "comment" : "Explains that CKShare UI is not available on Mac",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Family sharing setup is available on iPhone and iPad. You can still accept invitations on Mac."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Udostępnianie rodzinne ustawisz na iPhonie lub iPadzie. Na Macu możesz nadal przyjmować zaproszenia."
           }
         }
       }
@@ -2664,6 +2790,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Synchronizuj teraz"
+          }
+        }
+      }
+    },
+    "settings.sync.store_unavailable" : {
+      "comment" : "Error when accepting a share before the local store is wired",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The local medicine cabinet is not ready yet. Open the app and try again."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokalna apteczka nie jest jeszcze gotowa. Otwórz aplikację i spróbuj ponownie."
           }
         }
       }

@@ -64,10 +64,11 @@ struct MedicineCloudSnapshot: Equatable, Sendable {
         medicine.openedAt = openedAt
         medicine.daysAfterOpening = daysAfterOpening
         medicine.openedExpiryOverride = openedExpiryOverride
-        medicine.effectiveExpiryDate = effectiveExpiryDate
         medicine.createdAt = createdAt
         medicine.archivedAt = archivedAt
         medicine.archiveReasonRaw = archiveReasonRaw
         medicine.modifiedAt = modifiedAt
+        // Recalculate so denormalized expiry cannot drift from cloud payload fields.
+        medicine.refreshEffectiveExpiry()
     }
 }

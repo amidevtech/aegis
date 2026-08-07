@@ -50,7 +50,7 @@ enum MedicineListFilter: String, Hashable, CaseIterable, Identifiable {
         switch self {
         case .all: true
         case .opened: medicine.isOpened
-        case .expiringSoon: medicine.status(now: now) != .valid
+        case .expiringSoon: medicine.status(now: now) == .expiringSoon
         }
     }
 }

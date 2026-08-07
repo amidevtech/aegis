@@ -12,6 +12,9 @@ final class LocalStore {
     let container: ModelContainer
     var context: ModelContext { container.mainContext }
 
+    /// Last save failure, surfaced to the UI. Cleared on the next successful save.
+    private(set) var lastErrorMessage: String?
+
     init(container: ModelContainer) {
         self.container = container
     }
@@ -21,13 +24,22 @@ final class LocalStore {
         save()
     }
 
-    func save() {
-        guard context.hasChanges else { return }
+    @discardableResult
+    func save() -> Bool {
+        guard context.hasChanges else { return true }
         do {
             try context.save()
+            lastErrorMessage = nil
+            return true
         } catch {
+            lastErrorMessage = error.localizedDescription
             assertionFailure("Failed to save LocalStore: \(error)")
+            return false
         }
+    }
+
+    func clearError() {
+        lastErrorMessage = nil
     }
 
     func delete(_ medicine: Medicine) {

@@ -16,6 +16,7 @@ struct ExpiredAlertSheet: View {
     @Environment(AppState.self) private var appState
 
     @State private var pendingDeleteAll = false
+    @State private var medicinePendingDeletion: Medicine?
     @State private var handledUUIDs: Set<UUID> = []
 
     private var remainingMedicines: [Medicine] {
@@ -72,17 +73,42 @@ struct ExpiredAlertSheet: View {
             } message: {
                 Text(L10n.Medicines.deleteConfirmMessage)
             }
+            .confirmationDialog(
+                Text(L10n.Medicines.deleteConfirmTitle),
+                isPresented: singleDeleteDialogBinding,
+                titleVisibility: .visible,
+                presenting: medicinePendingDeletion
+            ) { medicine in
+                Button(L10n.Common.delete, role: .destructive) {
+                    MedicineActions.delete(medicine, in: repository)
+                    handledUUIDs.insert(medicine.uuid)
+                    medicinePendingDeletion = nil
+                    if remainingMedicines.isEmpty { dismiss() }
+                }
+                Button(L10n.Common.cancel, role: .cancel) {
+                    medicinePendingDeletion = nil
+                }
+            } message: { _ in
+                Text(L10n.Medicines.deleteConfirmMessage)
+            }
         }
         #if os(macOS)
         .frame(minWidth: 520, minHeight: 460)
         #endif
     }
 
+    private var singleDeleteDialogBinding: Binding<Bool> {
+        Binding(
+            get: { medicinePendingDeletion != nil },
+            set: { if !$0 { medicinePendingDeletion = nil } })
+    }
+
     private var banner: some View {
         VStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 38))
+                .font(.largeTitle.weight(.semibold))
                 .foregroundStyle(Theme.Palette.danger)
+                .accessibilityHidden(true)
 
             Text(L10n.Expired.message(remainingMedicines.count))
                 .font(.title3.weight(.semibold))
@@ -132,9 +158,12 @@ struct ExpiredAlertSheet: View {
             .buttonBorderShape(.capsule)
             .controlSize(.small)
             .tint(Theme.Palette.danger)
+            .accessibilityHint(
+                Text(subscriptionStore.isPro ? L10n.Expired.footnote : L10n.Medicines.deleteConfirmMessage))
         }
         .padding(12)
         .card(cornerRadius: 12, padding: 0, borderColor: Theme.Palette.danger.opacity(0.3))
+        .accessibilityElement(children: .combine)
     }
 
     private func handleAll() {
@@ -160,9 +189,7 @@ struct ExpiredAlertSheet: View {
             handledUUIDs.insert(medicine.uuid)
             if remainingMedicines.isEmpty { dismiss() }
         } else {
-            MedicineActions.delete(medicine, in: repository)
-            handledUUIDs.insert(medicine.uuid)
-            if remainingMedicines.isEmpty { dismiss() }
+            medicinePendingDeletion = medicine
         }
     }
 }

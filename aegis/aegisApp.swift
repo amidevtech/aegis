@@ -71,15 +71,23 @@ struct aegisApp: App {
         #if canImport(UIKit) && !os(watchOS)
         AegisSceneDelegate.onAcceptShare = { [services] metadata in
             Task {
-                try? await services.cloudSync.acceptShare(metadata: metadata)
                 await services.repository.syncProState()
+                do {
+                    try await services.cloudSync.acceptShare(metadata: metadata)
+                } catch {
+                    // `acceptShare` already records `lastErrorMessage` for Root/Settings.
+                }
             }
         }
         #elseif os(macOS)
         AegisAppDelegate.onAcceptShare = { [services] metadata in
             Task {
-                try? await services.cloudSync.acceptShare(metadata: metadata)
                 await services.repository.syncProState()
+                do {
+                    try await services.cloudSync.acceptShare(metadata: metadata)
+                } catch {
+                    // `acceptShare` already records `lastErrorMessage` for Root/Settings.
+                }
             }
         }
         #endif
@@ -88,20 +96,18 @@ struct aegisApp: App {
     /// Free and Pro both use local SwiftData. CloudKit is a custom sync
     /// (`CloudSyncService`) enabled only with a Pro entitlement — we do not use
     /// built-in `cloudKitDatabase: .automatic` (no CKShare support).
+    ///
+    /// Disk-only: never fall back to an in-memory store (that would silently
+    /// discard cabinet data on quit).
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([Medicine.self])
-        let candidates: [ModelConfiguration] = [
-            ModelConfiguration(schema: schema, cloudKitDatabase: .none),
-            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-        ]
+        let configuration = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
 
-        for configuration in candidates {
-            if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
-                return container
-            }
+        do {
+            return try ModelContainer(for: schema, configurations: [configuration])
+        } catch {
+            fatalError("Failed to open the on-disk medicine cabinet store: \(error)")
         }
-
-        fatalError("Failed to create a data store in any configuration")
     }
 }
 

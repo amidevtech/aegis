@@ -44,7 +44,7 @@ struct SymbolTile: View {
 
     var body: some View {
         Image(systemName: systemName)
-            .font(.system(size: size * 0.45, weight: .semibold))
+            .font(.title2.weight(.semibold))
             .foregroundStyle(tint)
             .frame(width: size, height: size)
             .background(
@@ -92,7 +92,7 @@ struct StatusTag: View {
             StatusTag(text: L10n.Status.expired, tint: Theme.Palette.danger,
                       systemImage: "exclamationmark.triangle.fill")
         }
-        Text("Karta")
+        Text(L10n.App.title)
             .frame(maxWidth: .infinity)
             .card()
     }

@@ -18,6 +18,9 @@ final class MedicineRepository {
     private let cloudSync: CloudSyncService
     private let subscriptionStore: SubscriptionStore
 
+    /// Last local persistence failure for UI surfacing.
+    private(set) var lastErrorMessage: String?
+
     var isPro: Bool { subscriptionStore.isPro }
 
     init(
@@ -30,6 +33,11 @@ final class MedicineRepository {
         self.subscriptionStore = subscriptionStore
     }
 
+    func clearError() {
+        lastErrorMessage = nil
+        localStore.clearError()
+    }
+
     func upsert(_ medicine: Medicine, isNew: Bool) {
         medicine.touchModified()
         if isNew {
@@ -37,6 +45,7 @@ final class MedicineRepository {
         } else {
             localStore.save()
         }
+        capturePersistenceError()
         Task { await NotificationService.shared.reschedule(for: medicine) }
         enqueueCloudUpsert(medicine)
     }
@@ -49,6 +58,7 @@ final class MedicineRepository {
         }
         medicine.touchModified()
         localStore.save()
+        capturePersistenceError()
         Task { await NotificationService.shared.reschedule(for: medicine) }
         enqueueCloudUpsert(medicine)
     }
@@ -60,6 +70,7 @@ final class MedicineRepository {
         medicine.touchModified()
         NotificationService.shared.cancel(for: medicine)
         localStore.save()
+        capturePersistenceError()
         enqueueCloudUpsert(medicine)
         return .success(())
     }
@@ -73,6 +84,7 @@ final class MedicineRepository {
             NotificationService.shared.cancel(for: medicine)
         }
         localStore.save()
+        capturePersistenceError()
         for medicine in medicines {
             enqueueCloudUpsert(medicine)
         }
@@ -86,6 +98,7 @@ final class MedicineRepository {
         medicine.refreshEffectiveExpiry()
         medicine.touchModified()
         localStore.save()
+        capturePersistenceError()
         Task { await NotificationService.shared.reschedule(for: medicine) }
         enqueueCloudUpsert(medicine)
         return .success(())
@@ -96,6 +109,7 @@ final class MedicineRepository {
         let uuid = medicine.uuid
         NotificationService.shared.cancel(for: medicine)
         localStore.delete(medicine)
+        capturePersistenceError()
         if isPro {
             Task { await cloudSync.deleteMedicine(uuid: uuid) }
         }
@@ -107,6 +121,14 @@ final class MedicineRepository {
         } else {
             await cloudSync.stop()
         }
+    }
+
+    func fetchActiveMedicines() throws -> [Medicine] {
+        try localStore.fetchActive()
+    }
+
+    private func capturePersistenceError() {
+        lastErrorMessage = localStore.lastErrorMessage
     }
 
     private func enqueueCloudUpsert(_ medicine: Medicine) {

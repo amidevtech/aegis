@@ -14,12 +14,12 @@ struct MedicineDetailView: View {
     @Environment(SubscriptionStore.self) private var subscriptionStore
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var isPresentingEditor = false
     @State private var isPresentingArchiveOptions = false
     @State private var isPresentingDeleteConfirm = false
-
-    private let now = Date.now
+    @State private var now = Date.now
 
     private var status: MedicineStatus { medicine.status(now: now) }
 
@@ -74,15 +74,20 @@ struct MedicineDetailView: View {
                         } label: {
                             Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
                         }
-                    }
-                } else {
-                    if subscriptionStore.isPro {
+
                         Button(role: .destructive) {
-                            isPresentingArchiveOptions = true
+                            isPresentingDeleteConfirm = true
                         } label: {
-                            Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                            Label(L10n.Common.delete, systemImage: "trash.fill")
                         }
                     }
+                } else if subscriptionStore.isPro {
+                    Button(role: .destructive) {
+                        isPresentingArchiveOptions = true
+                    } label: {
+                        Label(L10n.Detail.archive, systemImage: "archivebox.fill")
+                    }
+                } else {
                     Button(role: .destructive) {
                         isPresentingDeleteConfirm = true
                     } label: {
@@ -126,7 +131,7 @@ struct MedicineDetailView: View {
         }
         .confirmationDialog(
             Text(
-                subscriptionStore.isPro
+                medicine.isArchived
                     ? L10n.Archive.deleteConfirmTitle
                     : L10n.Medicines.deleteConfirmTitle),
             isPresented: $isPresentingDeleteConfirm,
@@ -139,9 +144,12 @@ struct MedicineDetailView: View {
             Button(L10n.Common.cancel, role: .cancel) {}
         } message: {
             Text(
-                subscriptionStore.isPro
+                medicine.isArchived
                     ? L10n.Archive.deleteConfirmMessage
                     : L10n.Medicines.deleteConfirmMessage)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { now = .now }
         }
     }
 

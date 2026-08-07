@@ -9,6 +9,7 @@ import SwiftUI
 /// Cabinet history (Pro only). Medicines land here instead of being deleted.
 struct ArchiveView: View {
     @Environment(MedicineRepository.self) private var repository
+    @Environment(AppState.self) private var appState
 
     @Query(filter: MedicineQueries.archived, sort: MedicineQueries.byArchiveDate)
     private var medicines: [Medicine]
@@ -84,11 +85,15 @@ struct ArchiveView: View {
                     }
                     .swipeActions(edge: .leading) {
                         Button {
-                            _ = MedicineActions.restore(medicine, in: repository)
+                            let result = MedicineActions.restore(medicine, in: repository)
+                            if case .failure(.requiresPro) = result {
+                                appState.presentPaywall()
+                            }
                         } label: {
                             Label(L10n.Archive.restore, systemImage: "arrow.uturn.backward")
                         }
                         .tint(Theme.Palette.brand)
+                        .accessibilityHint(Text(L10n.Archive.restore))
                     }
                 }
             } header: {
@@ -158,5 +163,6 @@ struct ArchiveView: View {
         .environment(AppState())
         .environment(services.subscriptionStore)
         .environment(services.repository)
+        .environment(services.cloudSync)
         .modelContainer(container)
 }

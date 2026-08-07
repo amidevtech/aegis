@@ -13,6 +13,7 @@ import UIKit
 struct CloudSharingViewRepresentable: UIViewControllerRepresentable {
     let share: CKShare
     let container: CKContainer
+    var onError: ((Error) -> Void)?
 
     func makeUIViewController(context: Context) -> UICloudSharingController {
         let controller = UICloudSharingController(share: share, container: container)
@@ -21,18 +22,26 @@ struct CloudSharingViewRepresentable: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: UICloudSharingController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UICloudSharingController, context: Context) {
+        context.coordinator.onError = onError
+    }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(onError: onError)
     }
 
     final class Coordinator: NSObject, UICloudSharingControllerDelegate {
+        var onError: ((Error) -> Void)?
+
+        init(onError: ((Error) -> Void)?) {
+            self.onError = onError
+        }
+
         func cloudSharingController(
             _ csc: UICloudSharingController,
             failedToSaveShareWithError error: Error
         ) {
-            // The error is also visible in the system UI.
+            onError?(error)
         }
 
         func itemThumbnailData(for csc: UICloudSharingController) -> Data? { nil }
@@ -48,11 +57,10 @@ import AppKit
 struct CloudSharingViewRepresentable: NSViewControllerRepresentable {
     let share: CKShare
     let container: CKContainer
+    var onError: ((Error) -> Void)?
 
     func makeNSViewController(context: Context) -> NSViewController {
-        // macOS 12+: UICloudSharingController does not exist; we use an info sheet
-        // with a link — full NSSharingServicePicker needs an extra bridge.
-        // Present an empty host; SettingsView shows instructions when a share already exists.
+        // macOS sharing UI is presented from Settings as unavailable guidance.
         NSViewController()
     }
 
