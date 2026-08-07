@@ -2812,6 +2812,24 @@
         }
       }
     },
+    "settings.sync.not_running" : {
+      "comment" : "Error when accepting a share while sync is stopped (Free or no iCloud)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cloud sync is not active. Upgrade to Pro and sign in to iCloud to accept a shared cabinet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizacja w chmurze jest nieaktywna. Przejdź na Pro i zaloguj się do iCloud, aby zaakceptować udostępnioną apteczkę."
+          }
+        }
+      }
+    },
     "settings.title" : {
       "comment" : "Title of the settings screen",
       "extractionState" : "manual",

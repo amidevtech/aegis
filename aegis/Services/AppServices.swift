@@ -14,10 +14,10 @@ final class AppServices {
     let cloudSync: CloudSyncService
     let repository: MedicineRepository
 
-    init(modelContainer: ModelContainer) {
+    init(modelContainer: ModelContainer, outbox: CloudSyncOutbox = CloudSyncOutbox()) {
         let subscriptionStore = SubscriptionStore()
         let localStore = LocalStore(container: modelContainer)
-        let cloudSync = CloudSyncService()
+        let cloudSync = CloudSyncService(outbox: outbox)
         let repository = MedicineRepository(
             localStore: localStore,
             cloudSync: cloudSync,

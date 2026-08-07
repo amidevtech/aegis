@@ -10,7 +10,7 @@ import SwiftData
 enum PreviewData {
 
     static let container: ModelContainer = {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         guard let container = try? ModelContainer(for: Medicine.self, configurations: configuration)
         else { fatalError("Failed to create preview container") }
 
@@ -22,7 +22,7 @@ enum PreviewData {
 
     /// Empty cabinet — for empty-state previews.
     static let emptyContainer: ModelContainer = {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         guard let container = try? ModelContainer(for: Medicine.self, configurations: configuration)
         else { fatalError("Failed to create preview container") }
         return container

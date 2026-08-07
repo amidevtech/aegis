@@ -101,6 +101,33 @@ enum MedicineRecordCoder {
         record["modifiedAt"] = Date.now as CKRecordValue
         return record
     }
+
+    static func modifiedAt(from record: CKRecord) -> Date? {
+        record["modifiedAt"] as? Date
+    }
+
+    /// Upload when local is strictly newer than cloud. Skip when cloud is missing
+    /// a timestamp only if we still want to upload — callers pass cloud date when known.
+    /// On ties (`cloud >= local`), skip upload so devices do not thrash.
+    static func shouldUpload(localModifiedAt: Date, cloudModifiedAt: Date?) -> Bool {
+        guard let cloudModifiedAt else { return true }
+        return localModifiedAt > cloudModifiedAt
+    }
+
+    /// Shared-zone UUIDs that were routed locally but absent from a successful pull.
+    static func departedSharedUUIDs(previous: Set<UUID>, seen: Set<UUID>) -> Set<UUID> {
+        previous.subtracting(seen)
+    }
+
+    /// Tombstoned shared hits keep routing / seen membership; only skip local upsert.
+    static func shouldUpsertSharedPull(isTombstoned: Bool) -> Bool {
+        !isTombstoned
+    }
+
+    /// Concatenate CloudKit query pages in order (cursor pagination).
+    static func mergePagedResults<T>(_ pages: [[T]]) -> [T] {
+        pages.flatMap { $0 }
+    }
 }
 
 extension MedicineCloudSnapshot {

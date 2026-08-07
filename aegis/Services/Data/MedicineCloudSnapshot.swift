@@ -6,7 +6,7 @@
 import Foundation
 
 /// Stateless medicine snapshot for LocalStore ↔ CloudKit mirroring (no SwiftData dependency in the coder).
-struct MedicineCloudSnapshot: Equatable, Sendable {
+struct MedicineCloudSnapshot: Equatable, Sendable, Codable {
     var uuid: UUID
     var name: String
     var activeSubstance: String

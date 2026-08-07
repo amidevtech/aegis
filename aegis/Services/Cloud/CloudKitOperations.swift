@@ -48,10 +48,18 @@ enum CloudKitOperations {
         in database: CKDatabase
     ) async throws {
         guard !records.isEmpty || !ids.isEmpty else { return }
-        _ = try await database.modifyRecords(saving: records, deleting: ids)
+        do {
+            _ = try await database.modifyRecords(saving: records, deleting: ids)
+        } catch let error as CKError {
+            let retry = try resolveConflicts(error: error, intendedSaves: records)
+            guard !retry.isEmpty || !ids.isEmpty else { return }
+            if !retry.isEmpty || !ids.isEmpty {
+                _ = try await database.modifyRecords(saving: retry, deleting: ids)
+            }
+        }
     }
 
-    /// Fetches existing records (preserving change tags), applies snapshots, then saves.
+    /// Fetches existing records (preserving change tags), applies snapshots with upload LWW, then saves.
     static func upsertMedicineRecords(
         _ snapshots: [MedicineCloudSnapshot],
         zoneID: CKRecordZone.ID,
@@ -75,9 +83,16 @@ enum CloudKitOperations {
             // Fall through — treat all as creates when the batch fetch fails.
         }
 
-        let records: [CKRecord] = snapshots.map { snapshot in
+        let records: [CKRecord] = snapshots.compactMap { snapshot in
             let id = MedicineRecordCoder.recordID(for: snapshot.uuid, zoneID: zoneID)
             if let existing = existingByID[id] {
+                let cloudModified = MedicineRecordCoder.modifiedAt(from: existing)
+                guard MedicineRecordCoder.shouldUpload(
+                    localModifiedAt: snapshot.modifiedAt,
+                    cloudModifiedAt: cloudModified)
+                else {
+                    return nil
+                }
                 MedicineRecordCoder.apply(snapshot, to: existing)
                 return existing
             }
@@ -100,8 +115,27 @@ enum CloudKitOperations {
         let query = CKQuery(
             recordType: MedicineRecordCoder.recordType,
             predicate: NSPredicate(value: true))
-        let (results, _) = try await database.records(matching: query, inZoneWith: zoneID)
-        return results.compactMap { _, result in
+
+        var pages: [[CKRecord]] = []
+        var cursor: CKQueryOperation.Cursor?
+
+        let first = try await database.records(matching: query, inZoneWith: zoneID)
+        pages.append(Self.records(from: first.matchResults))
+        cursor = first.queryCursor
+
+        while let current = cursor {
+            let next = try await database.records(continuingMatchFrom: current)
+            pages.append(Self.records(from: next.matchResults))
+            cursor = next.queryCursor
+        }
+
+        return MedicineRecordCoder.mergePagedResults(pages)
+    }
+
+    private static func records(
+        from matchResults: [(CKRecord.ID, Result<CKRecord, any Error>)]
+    ) -> [CKRecord] {
+        matchResults.compactMap { _, result in
             if case .success(let record) = result { return record }
             return nil
         }
@@ -156,6 +190,64 @@ enum CloudKitOperations {
         var deletions: [CKRecord.ID] = []
         var token: CKServerChangeToken?
         var moreComing = false
+    }
+
+    /// Returns records that should be retried after a conflict (local still wins LWW).
+    /// Throws the original error when the conflict cannot be resolved.
+    private static func resolveConflicts(
+        error: CKError,
+        intendedSaves: [CKRecord]
+    ) throws -> [CKRecord] {
+        let intendedByID = Dictionary(
+            uniqueKeysWithValues: intendedSaves.map { ($0.recordID, $0) })
+
+        var serverByID: [CKRecord.ID: CKRecord] = [:]
+
+        if error.code == .serverRecordChanged {
+            if let server = error.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord {
+                serverByID[server.recordID] = server
+            }
+        }
+
+        if error.code == .partialFailure,
+           let partial = error.partialErrorsByItemID as? [CKRecord.ID: Error]
+        {
+            for (id, itemError) in partial {
+                guard let ckError = itemError as? CKError else { continue }
+                if ckError.code == .serverRecordChanged,
+                   let server = ckError.userInfo[CKRecordChangedErrorServerRecordKey] as? CKRecord
+                {
+                    serverByID[id] = server
+                } else if ckError.code != .serverRecordChanged {
+                    throw error
+                }
+            }
+        } else if error.code != .serverRecordChanged {
+            throw error
+        }
+
+        var retry: [CKRecord] = []
+        for (id, server) in serverByID {
+            guard let intended = intendedByID[id] else { continue }
+            let localModified = MedicineRecordCoder.modifiedAt(from: intended) ?? .distantPast
+            let cloudModified = MedicineRecordCoder.modifiedAt(from: server)
+            guard MedicineRecordCoder.shouldUpload(
+                localModifiedAt: localModified,
+                cloudModifiedAt: cloudModified)
+            else {
+                continue
+            }
+            if let snapshot = MedicineRecordCoder.snapshot(from: intended) {
+                MedicineRecordCoder.apply(snapshot, to: server)
+                retry.append(server)
+            }
+        }
+
+        // If we had conflicts but none to retry, treat as success (cloud won LWW).
+        if serverByID.isEmpty {
+            throw error
+        }
+        return retry
     }
 }
 

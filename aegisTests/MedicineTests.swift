@@ -14,9 +14,13 @@ import Testing
 struct MedicineTests {
 
     private func makeServices(isPro: Bool = true) throws -> AppServices {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Medicine.self, configurations: configuration)
-        let services = AppServices(modelContainer: container)
+        let suite = "MedicineTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        let outbox = CloudSyncOutbox(defaults: defaults, key: "test.outbox")
+        let services = AppServices(modelContainer: container, outbox: outbox)
         services.subscriptionStore.debugProOverride = isPro
         return services
     }

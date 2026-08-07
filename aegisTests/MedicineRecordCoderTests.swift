@@ -55,7 +55,7 @@ struct MedicineRecordCoderTests {
     @Test("Last-write-wins: older snapshot does not overwrite newer local data")
     @MainActor
     func olderCloudSnapshotDoesNotOverwriteNewerLocal() throws {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Medicine.self, configurations: configuration)
         let store = LocalStore(container: container)
 
@@ -75,7 +75,7 @@ struct MedicineRecordCoderTests {
     @Test("Newer cloud snapshot overwrites local data")
     @MainActor
     func newerCloudSnapshotOverwritesLocal() throws {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: Medicine.self, configurations: configuration)
         let store = LocalStore(container: container)
 
@@ -90,5 +90,49 @@ struct MedicineRecordCoderTests {
 
         let stored = try #require(try store.medicine(uuid: medicine.uuid))
         #expect(stored.name == "Cloud")
+    }
+
+    @Test("Upload LWW helper skips equal and older local timestamps")
+    func shouldUploadHelper() {
+        let t = Date(timeIntervalSince1970: 100)
+        #expect(MedicineRecordCoder.shouldUpload(localModifiedAt: t, cloudModifiedAt: t) == false)
+        #expect(
+            MedicineRecordCoder.shouldUpload(
+                localModifiedAt: t,
+                cloudModifiedAt: Date(timeIntervalSince1970: 101)) == false)
+        #expect(
+            MedicineRecordCoder.shouldUpload(
+                localModifiedAt: Date(timeIntervalSince1970: 101),
+                cloudModifiedAt: t) == true)
+    }
+
+    @Test("Departed shared UUID helper")
+    func departedSharedHelper() {
+        let kept = UUID()
+        let gone = UUID()
+        #expect(
+            MedicineRecordCoder.departedSharedUUIDs(previous: [kept, gone], seen: [kept]) == [gone])
+    }
+
+    @Test("Tombstoned shared pull skips upsert but still counts as seen")
+    func sharedPullTombstoneDisposition() {
+        #expect(MedicineRecordCoder.shouldUpsertSharedPull(isTombstoned: false) == true)
+        #expect(MedicineRecordCoder.shouldUpsertSharedPull(isTombstoned: true) == false)
+
+        let uuid = UUID()
+        var seen: Set<UUID> = []
+        // Mimic pullShared: tombstoned hits still join `seen`.
+        seen.insert(uuid)
+        let shouldUpsert = MedicineRecordCoder.shouldUpsertSharedPull(isTombstoned: true)
+        #expect(shouldUpsert == false)
+        #expect(
+            MedicineRecordCoder.departedSharedUUIDs(previous: [uuid], seen: seen).isEmpty)
+    }
+
+    @Test("Paged query results concatenate in order")
+    func mergePagedResultsPreservesOrder() {
+        let merged = MedicineRecordCoder.mergePagedResults([[1, 2], [3], [4, 5]])
+        #expect(merged == [1, 2, 3, 4, 5])
+        #expect(MedicineRecordCoder.mergePagedResults([[Int]]()) == [])
     }
 }

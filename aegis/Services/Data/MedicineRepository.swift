@@ -105,14 +105,15 @@ final class MedicineRepository {
     }
 
     /// Permanent delete — Free from the active list, or Pro from the archive.
+    /// Always tombstones the UUID in the cloud outbox so Free→Pro cannot resurrect.
     func delete(_ medicine: Medicine) {
         let uuid = medicine.uuid
         NotificationService.shared.cancel(for: medicine)
         localStore.delete(medicine)
         capturePersistenceError()
-        if isPro {
-            Task { await cloudSync.deleteMedicine(uuid: uuid) }
-        }
+        // Tombstone synchronously so Free→Pro cannot resurrect even if the
+        // process dies before a flush Task runs.
+        cloudSync.enqueueDelete(uuid: uuid)
     }
 
     func syncProState() async {
@@ -133,7 +134,11 @@ final class MedicineRepository {
 
     private func enqueueCloudUpsert(_ medicine: Medicine) {
         guard isPro else { return }
+        // Snapshot now; hop before touching @Observable CloudSyncService so
+        // Observation does not re-enter SwiftData mid-mutation.
         let snapshot = MedicineCloudSnapshot(from: medicine)
-        Task { await cloudSync.upsert(snapshot) }
+        Task { @MainActor in
+            cloudSync.enqueueUpsert(snapshot)
+        }
     }
 }

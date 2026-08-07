@@ -27,6 +27,13 @@ final class CloudSyncService {
     /// Medicines that live in a shared zone (participant write-back target).
     private var sharedRecordIDs: [UUID: CKRecord.ID] = [:]
 
+    private let outbox: CloudSyncOutbox
+    private var syncChain: Task<Void, Never>?
+
+    /// Test seams for flush I/O; nil uses real CloudKit helpers.
+    private let cloudDeleteOverride: ((UUID) async throws -> Void)?
+    private let cloudUpsertOverride: ((MedicineCloudSnapshot) async throws -> Void)?
+
     private var changeToken: CKServerChangeToken? {
         get {
             guard let data = UserDefaults.standard.data(forKey: Self.tokenKey) else { return nil }
@@ -47,13 +54,24 @@ final class CloudSyncService {
 
     private static let tokenKey = "cloudSync.cabinetZoneChangeToken"
 
-    init(containerIdentifier: String = CloudSyncService.containerIdentifier) {
+    init(
+        containerIdentifier: String = CloudSyncService.containerIdentifier,
+        outbox: CloudSyncOutbox = CloudSyncOutbox(),
+        cloudDelete: ((UUID) async throws -> Void)? = nil,
+        cloudUpsert: ((MedicineCloudSnapshot) async throws -> Void)? = nil
+    ) {
         self.containerIdentifier = containerIdentifier
+        self.outbox = outbox
+        self.cloudDeleteOverride = cloudDelete
+        self.cloudUpsertOverride = cloudUpsert
     }
 
     var accountAvailable: Bool {
         iCloudAccountStatus == .available
     }
+
+    /// Pending cloud deletes (tombstones), used to block resurrection on pull.
+    var pendingDeleteUUIDs: Set<UUID> { outbox.pendingDeleteUUIDs }
 
     func clearError() {
         lastErrorMessage = nil
@@ -68,7 +86,92 @@ final class CloudSyncService {
         }
     }
 
+    // MARK: - Serial queue
+
+    @discardableResult
+    private func enqueue(_ work: @escaping () async -> Void) -> Task<Void, Never> {
+        let previous = syncChain
+        let task = Task { @MainActor in
+            _ = await previous?.value
+            await work()
+        }
+        syncChain = task
+        return task
+    }
+
+    // MARK: - Public API
+
     func start(using localStore: LocalStore) async {
+        await enqueue { [weak self] in
+            await self?.performStart(using: localStore)
+        }.value
+    }
+
+    func stop() async {
+        await enqueue { [weak self] in
+            self?.performStop()
+        }.value
+    }
+
+    /// Enqueues an upsert and flushes when sync is running.
+    func enqueueUpsert(_ snapshot: MedicineCloudSnapshot) {
+        outbox.enqueueUpsert(snapshot)
+        // Defer the `isRunning` read / flush schedule so Observation tracking
+        // does not re-enter SwiftData mid-mutation (can reset the model context).
+        Task { @MainActor in
+            guard self.isRunning else { return }
+            self.enqueue { [weak self] in
+                await self?.flushOutbox()
+            }
+        }
+    }
+
+    /// Enqueues a delete tombstone always; flushes when sync is running.
+    func enqueueDelete(uuid: UUID) {
+        outbox.enqueueDelete(uuid)
+        Task { @MainActor in
+            guard self.isRunning else { return }
+            self.enqueue { [weak self] in
+                await self?.flushOutbox()
+            }
+        }
+    }
+
+    func pullNow() async {
+        await enqueue { [weak self] in
+            await self?.performPullNow()
+        }.value
+    }
+
+    // MARK: - Sharing
+
+    func prepareShare() async throws -> CKShare {
+        let previous = syncChain
+        let task = Task { @MainActor in
+            _ = await previous?.value
+            return try await self.performPrepareShare()
+        }
+        syncChain = Task { @MainActor in
+            _ = try? await task.value
+        }
+        return try await task.value
+    }
+
+    func acceptShare(metadata: CKShare.Metadata) async throws {
+        let previous = syncChain
+        let task = Task { @MainActor in
+            _ = await previous?.value
+            try await self.performAcceptShare(metadata: metadata)
+        }
+        syncChain = Task { @MainActor in
+            _ = try? await task.value
+        }
+        try await task.value
+    }
+
+    // MARK: - Performers (always run on the serial chain)
+
+    private func performStart(using localStore: LocalStore) async {
         self.localStore = localStore
         await refreshAccountStatus()
         guard accountAvailable else {
@@ -79,69 +182,46 @@ final class CloudSyncService {
 
         do {
             try await ensureZoneAndCabinet()
-            // Populate shared-zone routing before push so participant edits
-            // do not land in the private database.
+            // Pull before push so newer cloud data is applied (and LWW upload
+            // skips stale local copies) before any outbox flush / bootstrap push.
             try await pullSharedMedicines()
-            try await pushAllLocalMedicines()
             try await pullChanges()
+            let flushSucceeded = await flushOutbox()
+            try await pushAllLocalMedicines()
             try await pullSharedMedicines()
             share = try await fetchExistingShare()
             isRunning = true
-            lastErrorMessage = nil
+            lastErrorMessage = CloudSyncErrorPolicy.errorMessageAfterSuccessfulSteps(
+                flushSucceeded: flushSucceeded,
+                flushErrorMessage: lastErrorMessage)
         } catch {
             lastErrorMessage = error.localizedDescription
             isRunning = false
         }
     }
 
-    func stop() async {
+    private func performStop() {
         isRunning = false
         share = nil
         sharedRecordIDs = [:]
+        localStore = nil
     }
 
-    func upsert(_ snapshot: MedicineCloudSnapshot) async {
-        guard isRunning else { return }
-        do {
-            let target = databaseAndZone(for: snapshot.uuid)
-            try await CloudKitOperations.upsertMedicineRecords(
-                [snapshot],
-                zoneID: target.zoneID,
-                database: target.database)
-            lastErrorMessage = nil
-        } catch {
-            lastErrorMessage = error.localizedDescription
-        }
-    }
-
-    func deleteMedicine(uuid: UUID) async {
-        guard isRunning else { return }
-        do {
-            let target = databaseAndZone(for: uuid)
-            let recordID = sharedRecordIDs[uuid]
-                ?? MedicineRecordCoder.recordID(for: uuid, zoneID: target.zoneID)
-            try await CloudKitOperations.deleteRecord(id: recordID, from: target.database)
-            sharedRecordIDs[uuid] = nil
-            lastErrorMessage = nil
-        } catch {
-            lastErrorMessage = error.localizedDescription
-        }
-    }
-
-    func pullNow() async {
+    private func performPullNow() async {
         guard isRunning else { return }
         do {
             try await pullChanges()
             try await pullSharedMedicines()
-            lastErrorMessage = nil
+            let flushSucceeded = await flushOutbox()
+            lastErrorMessage = CloudSyncErrorPolicy.errorMessageAfterSuccessfulSteps(
+                flushSucceeded: flushSucceeded,
+                flushErrorMessage: lastErrorMessage)
         } catch {
             lastErrorMessage = error.localizedDescription
         }
     }
 
-    // MARK: - Sharing
-
-    func prepareShare() async throws -> CKShare {
+    private func performPrepareShare() async throws -> CKShare {
         try await ensureZoneAndCabinet()
         if let existing = try await fetchExistingShare() {
             share = existing
@@ -162,19 +242,91 @@ final class CloudSyncService {
         return newShare
     }
 
-    func acceptShare(metadata: CKShare.Metadata) async throws {
+    private func performAcceptShare(metadata: CKShare.Metadata) async throws {
+        guard localStore != nil else {
+            throw CloudSyncError.storeUnavailable
+        }
+        guard isRunning else {
+            throw CloudSyncError.syncNotRunning
+        }
         do {
-            guard localStore != nil else {
-                throw CloudSyncError.storeUnavailable
-            }
             try await CloudKitOperations.accept(metadata, on: container)
             try await pullSharedMedicines()
-            isRunning = true
             lastErrorMessage = nil
         } catch {
             lastErrorMessage = error.localizedDescription
             throw error
         }
+    }
+
+    // MARK: - Outbox
+
+    /// Flushes pending outbox ops. Returns `true` when every op succeeded (or none pending).
+    @discardableResult
+    func flushOutbox() async -> Bool {
+        let ops = outbox.operations
+        guard !ops.isEmpty else { return true }
+
+        var firstError: Error?
+
+        for op in ops {
+            guard case .delete(let uuid) = op else { continue }
+            do {
+                try await performCloudDelete(uuid: uuid)
+                outbox.remove(op)
+            } catch {
+                firstError = firstError ?? error
+            }
+        }
+
+        for op in ops {
+            guard case .upsert(let snapshot) = op else { continue }
+            do {
+                try await performCloudUpsert(snapshot)
+                outbox.remove(op)
+            } catch {
+                firstError = firstError ?? error
+            }
+        }
+
+        if let firstError {
+            lastErrorMessage = firstError.localizedDescription
+            return false
+        }
+        return true
+    }
+
+    private func performCloudUpsert(_ snapshot: MedicineCloudSnapshot) async throws {
+        if let cloudUpsertOverride {
+            try await cloudUpsertOverride(snapshot)
+            return
+        }
+        try await upsertMedicineToCloud(snapshot)
+    }
+
+    private func performCloudDelete(uuid: UUID) async throws {
+        if let cloudDeleteOverride {
+            try await cloudDeleteOverride(uuid)
+            sharedRecordIDs[uuid] = nil
+            return
+        }
+        try await deleteMedicineFromCloud(uuid: uuid)
+    }
+
+    private func upsertMedicineToCloud(_ snapshot: MedicineCloudSnapshot) async throws {
+        let target = databaseAndZone(for: snapshot.uuid)
+        try await CloudKitOperations.upsertMedicineRecords(
+            [snapshot],
+            zoneID: target.zoneID,
+            database: target.database)
+    }
+
+    private func deleteMedicineFromCloud(uuid: UUID) async throws {
+        let target = databaseAndZone(for: uuid)
+        let recordID = sharedRecordIDs[uuid]
+            ?? MedicineRecordCoder.recordID(for: uuid, zoneID: target.zoneID)
+        try await CloudKitOperations.deleteRecord(id: recordID, from: target.database)
+        sharedRecordIDs[uuid] = nil
     }
 
     // MARK: - Routing
@@ -206,15 +358,19 @@ final class CloudSyncService {
         }
     }
 
+    /// Bootstrap / catch-up push. Upload LWW inside `upsertMedicineRecords` skips
+    /// records where cloud is already newer. Skips pending delete tombstones.
     private func pushAllLocalMedicines() async throws {
         guard let localStore else { return }
         let medicines = try localStore.fetchAll()
+        let tombstones = outbox.pendingDeleteUUIDs
         guard !medicines.isEmpty else { return }
 
         var privateSnapshots: [MedicineCloudSnapshot] = []
         var sharedByZone: [CKRecordZone.ID: [MedicineCloudSnapshot]] = [:]
 
         for medicine in medicines {
+            if tombstones.contains(medicine.uuid) { continue }
             let snapshot = MedicineCloudSnapshot(from: medicine)
             if let sharedID = sharedRecordIDs[medicine.uuid] {
                 sharedByZone[sharedID.zoneID, default: []].append(snapshot)
@@ -239,9 +395,21 @@ final class CloudSyncService {
     private func pullChanges() async throws {
         guard let localStore else { return }
 
+        do {
+            try await fetchAndApplyPrivateChanges(previousToken: changeToken)
+        } catch let error as CKError where error.code == .changeTokenExpired {
+            changeToken = nil
+            try await fetchAndApplyPrivateChanges(previousToken: nil)
+        }
+    }
+
+    private func fetchAndApplyPrivateChanges(previousToken: CKServerChangeToken?) async throws {
+        guard let localStore else { return }
+
         let zoneID = MedicineRecordCoder.zoneID
-        var pendingToken = changeToken
+        var pendingToken = previousToken
         var moreComing = true
+        let tombstones = outbox.pendingDeleteUUIDs
 
         while moreComing {
             let changes = try await CloudKitOperations.fetchZoneChanges(
@@ -250,6 +418,7 @@ final class CloudSyncService {
                 database: privateDatabase)
             for record in changes.modifications {
                 if let snapshot = MedicineRecordCoder.snapshot(from: record) {
+                    if tombstones.contains(snapshot.uuid) { continue }
                     try localStore.upsertFromCloud(snapshot)
                 }
             }
@@ -257,6 +426,7 @@ final class CloudSyncService {
                 if let uuid = UUID(uuidString: recordID.recordName) {
                     sharedRecordIDs[uuid] = nil
                     try localStore.deleteByUUID(uuid)
+                    NotificationService.shared.cancel(uuid: uuid)
                 }
             }
             pendingToken = changes.token
@@ -269,8 +439,10 @@ final class CloudSyncService {
     private func pullSharedMedicines() async throws {
         guard let localStore else { return }
 
+        let previousShared = Set(sharedRecordIDs.keys)
         let zones = try await CloudKitOperations.allRecordZones(in: sharedDatabase)
         var seenSharedUUIDs: Set<UUID> = []
+        let tombstones = outbox.pendingDeleteUUIDs
 
         for zone in zones {
             let records = try await CloudKitOperations.queryMedicines(
@@ -278,15 +450,25 @@ final class CloudSyncService {
                 database: sharedDatabase)
             for record in records {
                 guard let snapshot = MedicineRecordCoder.snapshot(from: record) else { continue }
+                // Always keep routing + seen membership for tombstones so flush
+                // deletes the shared record (not the private zone fallback).
                 sharedRecordIDs[snapshot.uuid] = record.recordID
                 seenSharedUUIDs.insert(snapshot.uuid)
+                let isTombstoned = tombstones.contains(snapshot.uuid)
+                guard MedicineRecordCoder.shouldUpsertSharedPull(isTombstoned: isTombstoned)
+                else { continue }
                 try localStore.upsertFromCloud(snapshot)
             }
         }
 
-        // Clear stale routing so local edits to departed shared items go to the private DB.
-        for uuid in Array(sharedRecordIDs.keys) where !seenSharedUUIDs.contains(uuid) {
+        // Successful pull completed — mirror departures by deleting local copies.
+        let departed = MedicineRecordCoder.departedSharedUUIDs(
+            previous: previousShared,
+            seen: seenSharedUUIDs)
+        for uuid in departed {
             sharedRecordIDs[uuid] = nil
+            try localStore.deleteByUUID(uuid)
+            NotificationService.shared.cancel(uuid: uuid)
         }
     }
 
@@ -301,11 +483,26 @@ final class CloudSyncService {
 
 enum CloudSyncError: LocalizedError {
     case storeUnavailable
+    case syncNotRunning
 
     var errorDescription: String? {
         switch self {
         case .storeUnavailable:
             String(localized: "settings.sync.store_unavailable")
+        case .syncNotRunning:
+            String(localized: "settings.sync.not_running")
         }
+    }
+}
+
+/// Error-clearing rules after a successful pull/start chain that includes flush.
+enum CloudSyncErrorPolicy {
+    /// Clears the surfaced error only when flush fully succeeded; otherwise keep
+    /// the flush failure message so Sync Now / start do not look healthy.
+    static func errorMessageAfterSuccessfulSteps(
+        flushSucceeded: Bool,
+        flushErrorMessage: String?
+    ) -> String? {
+        flushSucceeded ? nil : flushErrorMessage
     }
 }

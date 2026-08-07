@@ -508,6 +508,10 @@ nonisolated enum L10n {
             "settings.sync.store_unavailable",
             defaultValue: "The local medicine cabinet is not ready yet. Open the app and try again.",
             comment: "Error when accepting a share before the local store is wired")
+        static let syncNotRunning = LocalizedStringResource(
+            "settings.sync.not_running",
+            defaultValue: "Cloud sync is not active. Upgrade to Pro and sign in to iCloud to accept a shared cabinet.",
+            comment: "Error when accepting a share while sync is stopped (Free or no iCloud)")
         static let notificationsSection = LocalizedStringResource(
             "settings.notifications", defaultValue: "Notifications",
             comment: "Expiry reminder settings section")

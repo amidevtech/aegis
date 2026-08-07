@@ -106,7 +106,7 @@ final class NotificationService {
         cancel(uuid: medicine.uuid)
     }
 
-    private func cancel(uuid: UUID) {
+    func cancel(uuid: UUID) {
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
             return
         }
