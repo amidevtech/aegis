@@ -41,37 +41,37 @@ nonisolated enum MedicineForm: String, CaseIterable, Identifiable, Hashable, Sen
     var label: LocalizedStringResource {
         switch self {
         case .tablet:
-            LocalizedStringResource("medicine_form.tablet", defaultValue: "Tabletki",
+            LocalizedStringResource("medicine_form.tablet", defaultValue: "Tablets",
                                     comment: "Medicine form")
         case .capsule:
-            LocalizedStringResource("medicine_form.capsule", defaultValue: "Kapsułki",
+            LocalizedStringResource("medicine_form.capsule", defaultValue: "Capsules",
                                     comment: "Medicine form")
         case .syrup:
-            LocalizedStringResource("medicine_form.syrup", defaultValue: "Syrop",
+            LocalizedStringResource("medicine_form.syrup", defaultValue: "Syrup",
                                     comment: "Medicine form")
         case .drops:
-            LocalizedStringResource("medicine_form.drops", defaultValue: "Krople",
+            LocalizedStringResource("medicine_form.drops", defaultValue: "Drops",
                                     comment: "Medicine form")
         case .eyeDrops:
-            LocalizedStringResource("medicine_form.eye_drops", defaultValue: "Krople do oczu",
+            LocalizedStringResource("medicine_form.eye_drops", defaultValue: "Eye drops",
                                     comment: "Medicine form")
         case .ointment:
-            LocalizedStringResource("medicine_form.ointment", defaultValue: "Maść / krem",
+            LocalizedStringResource("medicine_form.ointment", defaultValue: "Ointment / cream",
                                     comment: "Medicine form")
         case .suppository:
-            LocalizedStringResource("medicine_form.suppository", defaultValue: "Czopki",
+            LocalizedStringResource("medicine_form.suppository", defaultValue: "Suppositories",
                                     comment: "Medicine form")
         case .spray:
             LocalizedStringResource("medicine_form.spray", defaultValue: "Spray",
                                     comment: "Medicine form")
         case .inhaler:
-            LocalizedStringResource("medicine_form.inhaler", defaultValue: "Inhalator",
+            LocalizedStringResource("medicine_form.inhaler", defaultValue: "Inhaler",
                                     comment: "Medicine form")
         case .injection:
-            LocalizedStringResource("medicine_form.injection", defaultValue: "Zastrzyk",
+            LocalizedStringResource("medicine_form.injection", defaultValue: "Injection",
                                     comment: "Medicine form")
         case .other:
-            LocalizedStringResource("medicine_form.other", defaultValue: "Inne",
+            LocalizedStringResource("medicine_form.other", defaultValue: "Other",
                                     comment: "Medicine form")
         }
     }

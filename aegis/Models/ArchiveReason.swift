@@ -24,13 +24,13 @@ nonisolated enum ArchiveReason: String, CaseIterable, Identifiable, Hashable, Se
     var label: LocalizedStringResource {
         switch self {
         case .expired:
-            LocalizedStringResource("archive_reason.expired", defaultValue: "Przeterminowany",
+            LocalizedStringResource("archive_reason.expired", defaultValue: "Expired",
                                     comment: "Reason for archiving a medicine")
         case .usedUp:
-            LocalizedStringResource("archive_reason.used_up", defaultValue: "Zużyty",
+            LocalizedStringResource("archive_reason.used_up", defaultValue: "Used up",
                                     comment: "Reason for archiving a medicine")
         case .removed:
-            LocalizedStringResource("archive_reason.removed", defaultValue: "Usunięty z apteczki",
+            LocalizedStringResource("archive_reason.removed", defaultValue: "Removed from cabinet",
                                     comment: "Reason for archiving a medicine")
         }
     }
